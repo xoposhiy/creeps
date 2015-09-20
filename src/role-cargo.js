@@ -1,4 +1,4 @@
-﻿module.exports = {
+module.exports = {
     waitTimeout: 25,
     finished: function(creep) { return creep.carry.energy == 0; },
 
