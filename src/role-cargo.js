@@ -1,6 +1,4 @@
-// Подносит энергию нуждающимся или в хранилище.
-
-module.exports = {
+п»їmodule.exports = {
     waitTimeout: 25,
     finished: function(creep) { return creep.carry.energy == 0; },
 

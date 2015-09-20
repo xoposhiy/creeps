@@ -1,5 +1,3 @@
-// Берет где-то энергию
-
 module.exports = {
     waitTimeout: 20,
 
