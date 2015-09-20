@@ -1,4 +1,4 @@
-var allRoles = ['harvester', 'upgrader', 'builder', 'guard', 'scout', 'cargo', 'hungry'];
+var allRoles = ['harvester', 'upgrader', 'builder', 'guard', 'scout', 'cargo', 'hungry', 'no'];
 
 var roles = {};
 

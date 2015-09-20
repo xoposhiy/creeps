@@ -21,28 +21,10 @@ function tryReturnEnergy(creep){
     }
 }
 
-function getEnergySink(creep){
-	var home = Game.spawns.home;
-    if (home.energy == home.energyCapacity){
-        var extensions = creep.room.find(FIND_MY_STRUCTURES, {
-            filter: { structureType: STRUCTURE_EXTENSION }
-        });
-        for(var i=0; i<extensions.length; i++) {
-            var e = extensions[i];
-            if (e.energy < e.energyCapacity){
-	            return e;
-            }
-        }
-    }
-    else
-        return home;
-}
-
 function getClosestEnergySink(creep){
     var sinks = creep.room.find(FIND_MY_STRUCTURES, {
         filter: { structureType: STRUCTURE_EXTENSION }
-    });
-    sinks.push(Game.spawns.home);
+    }).concat(creep.room.find(FIND_MY_SPAWNS));
     var sinks = _.filter(sinks,
         function(s){ return s.energy < s.energyCapacity});
     return creep.pos.findClosestByPath(sinks);
@@ -63,10 +45,4 @@ function tryMoveToSource(creep){
 	}
 	creep.say('no way');
 	return false;
-}
-
-function tryScoutNear(creep){
-	var sources = creep.room.find(FIND_EXIT_BOTTOM);
-    creep.moveTo(sources[0]);
-    
 }

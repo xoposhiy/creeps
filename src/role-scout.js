@@ -4,8 +4,9 @@ module.exports = function (creep) {
         creep.room.lookAt(Game.flags.energy.pos).forEach(function(e){if (e.type=='source') creep.harvest(e.source); })
     }
     else{
-        creep.moveTo(Game.spawns.home);
-        if (Game.spawns.home.room == creep.room){
+		var spawn = creep.pos.findClosestByPath(_.values(Game.spawns));
+        creep.moveTo(spawn);
+        if (spawn.room == creep.room){
             creep.memory.role = 'harvester';
         }
     }

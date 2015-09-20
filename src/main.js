@@ -1,3 +1,5 @@
+// hey!
+
 var roles = require('roles');
 Creep.prototype.assignNewRole = require('assignNewRole');
 Creep.prototype.takeEnergy = require('takeEnergy');
