@@ -1,0 +1,41 @@
+{
+  "name": "creeps",
+  "version": "1.0.0",
+  "description": "AI for screeps.com",
+  "main": "Gruntfile.js",
+  "dependencies": {
+    "grunt": "^0.4.5",
+    "grunt-screeps": "^1.1.0"
+  },
+  "devDependencies": {
+    "grunt-eslint": "^17.1.0",
+    "load-grunt-tasks": "^3.3.0"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xoposhiy/creeps.git"
+  },
+  "keywords": [
+    "screeps",
+    "ai"
+  ],
+  "author": "xoposhiy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xoposhiy/creeps/issues"
+  },
+  "homepage": "https://github.com/xoposhiy/creeps#readme",
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "ecmaFeatures": {
+      "arrowFunctions": true
+    },
+    "rules": {
+      "no-console": 0,
+      "no-undef": 0
+    }
+  }
+}
