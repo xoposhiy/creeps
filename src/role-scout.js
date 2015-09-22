@@ -1,13 +1,14 @@
-module.exports = function (creep) {
-    if (creep.carry.energy < creep.carryCapacity){
-        creep.moveTo(Game.flags['energy']);
-        creep.room.lookAt(Game.flags.energy.pos).forEach(function(e){if (e.type=='source') creep.harvest(e.source); })
-    }
-    else{
-		var spawn = _.values(Game.spawns)[0]; // TODO multispawn
-        creep.moveTo(spawn);
-        if (spawn.room == creep.room){
-            creep.memory.role = 'harvester';
-        }
-    }
-}
+module.exports = {
+	fits: creep => 
+		creep.bodyScore([WORK, CARRY, MOVE, MOVE]) && 
+		creep.carry.energy == 0 &&
+		Game.flags.energy,
+
+	finished: creep => creep.carry.energy == creep.carryCapacity,
+
+	run: function(creep) {
+		var target = Game.flags.energy;
+		return creep.approachAndDo(target, 
+			() => _.some(creep.room.lookAt(target), e => e.type=='source' && creep.harvest(e.source) == OK));
+	}	
+};
