@@ -1,12 +1,13 @@
 module.exports = {
 	waitTimeout: 2,
 
-	finished: function(creep) { return creep.carry.energy < 20; },
+	finished: function(creep) { return creep.carry.energy == 0; },
 
 	fits: function(creep){
-		var bodyIsOk = creep.bodyScore([MOVE, CARRY]) > 0;
-		var fullOfEnergy = creep.carry.energy == creep.carryCapacity;
-		return bodyIsOk && fullOfEnergy && findEnergySinks(creep).length > 0;
+		return creep.carry.energy == creep.carryCapacity &&
+			creep.bodyScore([MOVE, CARRY]) > 0 && 
+			!creep.room.isSpawningTime() &&
+			findEnergySinks(creep).length > 0;
 	},
 	
 	run: function(creep){
@@ -28,7 +29,6 @@ module.exports = {
 
 function findEnergySinks(creep){
 	return creep.room.find(FIND_MY_CREEPS, {filter: c => 
-			['builder', 'upgrader', 'hungry'].indexOf(c.memory.role) >= 0 && 
-			c.carry.energy < c.carryCapacity - 50 && c.getActiveBodyparts(WORK) > 0});
+			c.memory.role == 'upgrader' && c.carry.energy < c.carryCapacity && c.pos.canAssign(creep)});
 }
 

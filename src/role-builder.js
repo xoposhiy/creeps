@@ -3,9 +3,10 @@ module.exports = {
 	waitTimeout: 10,
 	
 	fits: function(creep){
-		var bodyIsOk = creep.bodyScore([MOVE, CARRY, WORK]) > 0;
-		var fullOfEnergy = creep.carry.energy == creep.carryCapacity;
-		return bodyIsOk && fullOfEnergy && getTarget(creep);
+		return creep.carry.energy == creep.carryCapacity && 
+			creep.bodyScore([MOVE, CARRY, WORK]) > 0 && 
+			!creep.room.isSpawningTime() && 
+			getTarget(creep);
 	},
 	
 	finished: function(creep){
@@ -27,7 +28,7 @@ function buildOrRepair(creep, structure){
 
 function getTarget(creep){
 	var targets = creep.room.find(FIND_CONSTRUCTION_SITES).
-		concat(creep.room.find(FIND_STRUCTURES, {filter: s => s.hits < s.hitsMax}));
+		concat(creep.room.find(FIND_STRUCTURES, {filter: s => s.hits < s.hitsMax && s.pos.canAssign(creep)}));
 	targets = _.sortBy(targets, t => scoreBuildTarget(creep, t));
 	return targets[0];
 }

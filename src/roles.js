@@ -41,17 +41,18 @@ function getCreepsByRole(){
 function assignNewRole(creep, finished) {
 	var oldRole = creep.memory.role;
 	var newRole = getNewRole(creep);
-	console.log("ROLE " + _.padLeft(oldRole, 12) + " → " + _.padRight(newRole, 12) + 
+	console.log(Game.time + " ROLE " + _.padLeft(oldRole, 12) + " → " + _.padRight(newRole, 12) + 
 				" " + creep + " " + creep.pos + 
 				(finished ? "" : " TIMEOUT"));
-	creep.memory.role = newRole;
-	creep.say("!" + creep.memory.role);
+	creep.memory = { role: newRole };
+	creep.say("!" + newRole);
 }
 
 function getNewRole(creep){
 	var creeps = getCreepsByRole();
 	var tryRole = (role, maxCreepsThisRole, totalCreeps) => 
 		{
+			maxCreepsThisRole = maxCreepsThisRole || 100500;
 			totalCreeps = totalCreeps || 0;
 			if (!creeps[role]) console.log("unknown " + role);
 			return (_.values(Game.creeps).length >= totalCreeps && 
@@ -60,14 +61,13 @@ function getNewRole(creep){
 					role : undefined; 
 		};
 	return (
-		tryRole('harvester', 3, 0) || 
-		tryRole('upgrader', 1, 4) || 
-		tryRole('builder', 1, 5) || 
-		tryRole('reservator', 1, 0) ||
-		tryRole('cargo', 2, 0) || 
-		tryRole('hungry', 3, 0) ||
-		tryRole('scout', 10, 6) ||
-		tryRole('reservator', 10000000, 0) ||
+		tryRole('harvester') || 
+		tryRole('upgrader') ||
+		tryRole('builder', 1) || 
+		tryRole('cargo') || 
+		tryRole('hungry') ||
+		tryRole('reservator') ||
+		//tryRole('scout', 100500) ||
 		'no'
 		);
 }

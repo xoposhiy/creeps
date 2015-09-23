@@ -1,8 +1,8 @@
 module.exports = {
 	fits: creep => 
-		creep.bodyScore([WORK, CARRY, MOVE, MOVE]) && 
-		creep.carry.energy == 0 &&
-		Game.flags.energy,
+		Game.flags.energy &&
+		creep.carry.energy == 0 && creep.ticksToLive > 200 &&
+		creep.bodyScore([WORK, CARRY, MOVE, MOVE]),
 
 	finished: creep => creep.carry.energy == creep.carryCapacity,
 

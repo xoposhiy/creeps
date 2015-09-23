@@ -35,7 +35,9 @@
     },
     "rules": {
       "no-console": 0,
-      "no-undef": 0
+      "no-undef": 0,
+      "no-constant-condition": 0,
+      "semi": 1
     }
   }
 }

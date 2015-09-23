@@ -1,5 +1,5 @@
 module.exports = {
-	fits: creep => creep.bodyScore([CARRY, MOVE]) > 0 && creep.carry.energy > 0,
+	fits: creep => creep.carry.energy > 0 && creep.bodyScore([CARRY, MOVE]) > 0,
 
 	finished: creep => creep.carry.energy == 0,
 
