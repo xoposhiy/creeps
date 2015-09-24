@@ -1,4 +1,4 @@
-var bodyPriority = [WORK, CARRY, MOVE, MOVE];
+var bodyPriority = [WORK, MOVE, CARRY];
 
 var price = {};
 price[WORK]= 100;
@@ -23,20 +23,20 @@ var getNextCreepBody = function(maxEnergy){
 		if (bodyWork > workCount+1) return body;
 		body.push(nextPart);
 	}
-	return body;
 };
 
 Spawn.prototype.controlSpawn = function (){
 	var spawn = this;
 	spawn.memory.wantToSpawn = wantToSpawn(spawn);
 	if (!spawn.memory.wantToSpawn) return;
-	console.log(Game.time + " SPAWN want to! (nextSpawnTime: " + spawn.memory.nextSpawnTime + ")");
+	if (Game.time % 5 == 0)
+		console.log(Game.time + " SPAWN want to! (nextSpawnTime: " + spawn.memory.nextSpawnTime + ")");
 	var maxEnergy = getTotalEnergyCapacity(this);
-	var body = body || getNextCreepBody(maxEnergy);
+	var body = getNextCreepBody(maxEnergy);
 	var canCreate = this.canCreateCreep(body);
 	if (canCreate == OK){
 		console.log("SPAWN creep: " + body);
-		spawn.memory.nextSpawnTime = Game.time + 100;
+		spawn.memory.nextSpawnTime = Game.time + 50;
 		clearDeadCreepsMemory();
 		spawn.createCreep(body, 'c' + body.length + '_' + Game.time, {role: 'no'});
 	}
@@ -44,9 +44,9 @@ Spawn.prototype.controlSpawn = function (){
 
 function wantToSpawn(spawn){
 	var creepsCount = _.values(Game.creeps).length;
-	return creepsCount > 20 || 
-		spawn.memory.nextSpawnTime == undefined ||
-		creepsCount > 5 && Game.time > spawn.memory.nextSpawnTime;
+	if (creepsCount > 15) return false;
+	return spawn.memory.nextSpawnTime == undefined ||
+			creepsCount < 5 || Game.time > spawn.memory.nextSpawnTime;
 }
 
 function getTotalEnergyCapacity(spawn){
@@ -57,6 +57,9 @@ function getTotalEnergyCapacity(spawn){
 
 function clearDeadCreepsMemory(){
 	for(var c in Memory.creeps){
-		if (!Game.creeps[c]) delete Memory.creeps[c];
+		//noinspection JSUnfilteredForInLoop
+		if (!Game.creeps[c])
+			//noinspection JSUnfilteredForInLoop
+			delete Memory.creeps[c];
 	}
 }

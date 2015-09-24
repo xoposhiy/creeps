@@ -1,16 +1,19 @@
 module.exports = {
+	/** @param {Creep} creep */
 	fits: creep => creep.carry.energy > 0 && creep.bodyScore([CARRY, MOVE]) > 0,
 
+	/** @param {Creep} creep */
 	finished: creep => creep.carry.energy == 0,
 
+	/** @param {Creep} creep */
 	run: function(creep) {
 		var s = getEnergySink(creep);
-		if (!s) console.log(creep + ' reservator has no sinks!');
 		return creep.approachAndDo(s, () => creep.transferEnergy(s));
 	}
 
 };
 
+/** @param {Creep} creep */
 function getEnergySink(creep){
 	var spawnOrExtension = creep.pos.findClosestByPath(
 		FIND_STRUCTURES, {filter: s => 
@@ -21,7 +24,7 @@ function getEnergySink(creep){
 	var storage = creep.pos.findClosestByPath(FIND_STRUCTURES, 
 		{filter: s => s.structureType == STRUCTURE_STORAGE && !isFull(s) && s.my});
 	if (storage) return storage;
-	return Game.flags.scouts;
+	return undefined;
 }
 
 function isFull(s){
