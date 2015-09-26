@@ -1,7 +1,10 @@
+///<reference path="lodash.d.ts"/>
+
 /**
  * A site of a structure which is currently under construction.
  */
 
+declare var ConstructionSite:any;
 interface ConstructionSite {
     /**
      * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
@@ -44,6 +47,7 @@ interface ConstructionSite {
 /**
  * Creeps are your units. Creeps can move, harvest energy, construct structures, attack another creeps, and perform other actions.
  */
+declare var Creep:any;
 interface Creep {
     /**
      * An array describing the creep’s body. Each element contains the following properties:
@@ -151,12 +155,14 @@ interface Creep {
     say(message:string): number;
     suicide(): number;
     transferEnergy(target:Creep|Spawn|Structure, amount?:number): number;
+    takeEnergyFrom(target:GameObject): number;
     unclaimController(target:Structure): number;
     upgradeController(target:Structure): number;
 }
 /**
  * A dropped piece of energy. It will decay after a while if not picked up.
  */
+declare var Energy:any;
 interface Energy {
     /**
      * The amount of energy containing.
@@ -178,6 +184,7 @@ interface Energy {
 /**
  * A flag. Flags can be used to mark particular spots in a room. Flags are visible to their owners only.
  */
+declare var Flag:any;
 interface Flag {
     /**
      * A unique object identificator. You can use Game.getObjectById method to retrieve an object instance by its id.
@@ -273,7 +280,7 @@ interface Game {
      * @param id The unique identificator.
      * @returns an object instance or null if it cannot be found.
      */
-    getObjectById<T>(id:string): T;
+    getObjectById(id:string): GameObject;
     /**
      * Get amount of CPU time used from the beginning of the current game tick. Note: In the Simulation mode it depends on your local machine performance and cannot be used to estimate server-side scripts execution.
      * @returns currently used CPU time as a float number.
@@ -295,7 +302,7 @@ interface GameMap {
      * @param roomName The room name.
      * @returns The exits information or null if the room not found.
      */
-    describeExits(roomName:string): {"1": string, "3": string, "5": string, "7": string};
+    describeExits(roomName:string): {"1": string; "3": string; "5": string; "7": string};
     /**
      * Find the exit direction from the given room en route to another room.
      * @param fromRoom Start room name or room object.
@@ -312,7 +319,7 @@ interface GameMap {
      * @param toRoom Finish room name or room object.
      * @returns the route array or ERR_NO_PATH code
      */
-    findRoute(fromRoom:string|Room, toRoom:string|Room): [{exit: string, room: string}]|number;
+    findRoute(fromRoom:string|Room, toRoom:string|Room): [{exit: string; room: string}]|number;
     /**
      * Check if the room with the given name is protected by temporary "newbie" walls.
      * @param roomName The room name.
@@ -322,6 +329,7 @@ interface GameMap {
 /**
  * An object representing the room in which your units and structures are in. It can be used to look around, find paths, etc. Every object in the room contains its linked Room instance in the room property.
  */
+declare var Room:any;
 interface Room {
     /**
      * The Controller structure of this room, if present, otherwise undefined.
@@ -390,7 +398,7 @@ interface Room {
      * @param opts An object with additional options
      * @returns An array with the objects found.
      */
-    find<T>(type:number, opts?:{filter: any|string}): T[];
+    find(type:number, opts?:{filter: any|string}): GameObject[];
     /**
      * Find the exit direction en route to another room.
      * @param room Another room name or room object.
@@ -464,6 +472,7 @@ interface Room {
 /**
  * An object representing the specified position in the room. Every object in the room contains RoomPosition as the pos property. The position object of a custom location can be obtained using the Room.getPositionAt() method or using the constructor.
  */
+declare var RoomPosition:any;
 interface RoomPosition {
     new(x:number, y:number, roomName:string): RoomPosition;
     roomName: string;
@@ -471,12 +480,12 @@ interface RoomPosition {
     y: number;
     createConstructionSite(structureType:string): number;
     createFlag(name:string, color:string): number;
-    findClosestByPath<T>(type:number, opts?:{filter: any|string, algorithm: string}): T;
-    findClosestByPath<T>(objects:[T|RoomPosition], opts?:{filter: any|string, algorithm: string}): T;
+    findClosestByPath<T>(type:number, opts?:{filter: any|string; algorithm?: string}): GameObject|RoomPosition;
+    findClosestByPath<T>(objects:(T|RoomPosition)[], opts?:{filter: any|string; algorithm?: string}): T;
     findClosestByRange<T>(type:number, opts?:{filter: any|string }): T;
-    findClosestByRange<T>(objects:[T|RoomPosition], opts?:{filter: any|string }): T;
-    findInRange<T>(type:number, range:number, opts?:{filter: any|string, algorithm: string}): T[];
-    findInRange<T>(objects:[T|RoomPosition], range:number, opts?:{filter: any|string, algorithm: string}): T[];
+    findClosestByRange<T>(objects:(T|RoomPosition)[], opts?:{filter: any|string }): T;
+    findInRange<T>(type:number, range:number, opts?:{filter: any|string; algorithm: string}): T[];
+    findInRange<T>(objects:(T|RoomPosition)[], range:number, opts?:{filter: any|string; algorithm: string}): T[];
     findPathTo(x:number, y:number, opts?:FindPathOpts): PathStep[];
     findPathTo(target:RoomPosition|{pos: RoomPosition}, opts?:FindPathOpts): PathStep[];
     getDirectionTo(x:number, y:number): number;
@@ -491,6 +500,7 @@ interface RoomPosition {
     look(): LookAtResult;
     lookFor<T>(type:string): T[];
 }
+declare var Source:any;
 interface Source {
     energy: number;
     energyCapacity: number;
@@ -499,6 +509,7 @@ interface Source {
     room: Room;
     ticksToRegeneration: number;
 }
+declare var Spawn:any;
 interface Spawn {
     energy: number;
     energyCapacity: number;
@@ -512,13 +523,14 @@ interface Spawn {
     pos: RoomPosition;
     room: Room;
     structureType: string;
-    spawning: {name: string, needTime: number, remainingTime: number};
+    spawning: {name: string; needTime: number; remainingTime: number};
     canCreateCreep(body:string[], name?:string): number;
     createCreep(body:string[], name?:string, memory?:any): string|number;
     destroy(): number;
     notifyWhenAttacked(enabled:boolean): number;
     transferEnergy(target:Creep, amount?:number): number;
 }
+declare var Structure:any;
 interface Structure {
     hits: number;
     hitsMax: number;
@@ -625,18 +637,14 @@ interface PathStep {
     dy: number;
     direction: string;
 }
+
 interface Memory {
     creeps: {[name: string]: CreepMemory};
     flags: {[name: string]: FlagMemory};
     rooms: {[name: string]: RoomMemory};
     spawns: {[name: string]: SpawnMemory};
-    assignedCreeps: {[pos: string]: Array<string>};
 }
 interface CreepMemory {
-    role: string;
-    target: string;
-    done: boolean;
-    startWaitTime: number;
 }
 interface FlagMemory {
 }
@@ -654,24 +662,24 @@ declare enum Direction {
     LEFT = 7,
     TOP_LEFT = 8
 }
-declare var FIND_EXIT_TOP = 1;
-declare var FIND_EXIT_RIGHT = 3;
-declare var FIND_EXIT_BOTTOM = 5;
-declare var FIND_EXIT_LEFT = 7;
-declare var FIND_EXIT = 10;
-declare var FIND_CREEPS = 101;
-declare var FIND_MY_CREEPS = 102;
-declare var FIND_HOSTILE_CREEPS = 103;
-declare var FIND_SOURCES_ACTIVE = 104;
-declare var FIND_SOURCES = 105;
-declare var FIND_DROPPED_ENERGY = 106;
-declare var FIND_STRUCTURES = 107;
-declare var FIND_MY_STRUCTURES = 108;
-declare var FIND_HOSTILE_STRUCTURES = 109;
-declare var FIND_FLAGS = 110;
-declare var FIND_CONSTRUCTION_SITES = 111;
-declare var FIND_MY_SPAWNS = 112;
-declare var FIND_HOSTILE_SPAWNS = 113;
+declare var FIND_EXIT_TOP;
+declare var FIND_EXIT_RIGHT;
+declare var FIND_EXIT_BOTTOM;
+declare var FIND_EXIT_LEFT;
+declare var FIND_EXIT;
+declare var FIND_CREEPS;
+declare var FIND_MY_CREEPS;
+declare var FIND_HOSTILE_CREEPS;
+declare var FIND_SOURCES_ACTIVE;
+declare var FIND_SOURCES;
+declare var FIND_DROPPED_ENERGY;
+declare var FIND_STRUCTURES;
+declare var FIND_MY_STRUCTURES;
+declare var FIND_HOSTILE_STRUCTURES;
+declare var FIND_FLAGS;
+declare var FIND_CONSTRUCTION_SITES;
+declare var FIND_MY_SPAWNS;
+declare var FIND_HOSTILE_SPAWNS;
 
 /**
  * need 8,11,13
@@ -680,39 +688,41 @@ declare var FIND_HOSTILE_SPAWNS = 113;
 declare var Game:Game;
 declare var Memory:Memory;
 
-declare var STRUCTURE_EXTENSION = "extension";
-declare var STRUCTURE_RAMPART = "rampart";
-declare var STRUCTURE_ROAD = "road";
-declare var STRUCTURE_SPAWN = "spawn";
-declare var STRUCTURE_LINK = "link";
-declare var STRUCTURE_WALL = "constructedWall";
-declare var STRUCTURE_KEEPER_LAIR = "keeperLair";
-declare var STRUCTURE_CONTROLLER = "controller";
-declare var STRUCTURE_STORAGE = "storage";
+declare var STRUCTURE_EXTENSION;
+declare var STRUCTURE_RAMPART;
+declare var STRUCTURE_ROAD;
+declare var STRUCTURE_SPAWN;
+declare var STRUCTURE_LINK;
+declare var STRUCTURE_WALL;
+declare var STRUCTURE_PORTAL;
+declare var STRUCTURE_KEEPER_LAIR;
+declare var STRUCTURE_CONTROLLER;
+declare var STRUCTURE_STORAGE;
 
-declare var MOVE = "move";
-declare var WORK = "work";
-declare var CARRY = "carry";
-declare var ATTACK = "attack";
-declare var RANGED_ATTACK = "ranged_attack";
-declare var TOUGH = "tough";
-declare var HEAL = "heal";
+declare var MOVE;
+declare var WORK;
+declare var CARRY;
+declare var ATTACK;
+declare var RANGED_ATTACK;
+declare var TOUGH;
+declare var HEAL;
 
-declare var OK	= 0;
-declare var ERR_NOT_OWNER	= -1;
-declare var ERR_NO_PATH	= -2;
-declare var ERR_NAME_EXISTS	= -3;
-declare var ERR_BUSY	= -4;
-declare var ERR_NOT_FOUND	= -5;
-declare var ERR_NOT_ENOUGH_ENERGY	= -6;
-declare var ERR_INVALID_TARGET	= -7;
-declare var ERR_FULL	= -8;
-declare var ERR_NOT_IN_RANGE	= -9;
-declare var ERR_INVALID_ARGS	= -10;
-declare var ERR_TIRED	= -11;
-declare var ERR_NO_BODYPART	= -12;
-declare var ERR_NOT_ENOUGH_EXTENSIONS	= -6;
-declare var ERR_RCL_NOT_ENOUGH	= -14;
-declare var ERR_GCL_NOT_ENOUGH	= -15;
+declare var OK;
+declare var ERR_NOT_OWNER;
+declare var ERR_NO_PATH;
+declare var ERR_NAME_EXISTS;
+declare var ERR_BUSY;
+declare var ERR_NOT_FOUND;
+declare var ERR_NOT_ENOUGH_ENERGY;
+declare var ERR_INVALID_TARGET;
+declare var ERR_FULL;
+declare var ERR_NOT_IN_RANGE;
+declare var ERR_INVALID_ARGS;
+declare var ERR_TIRED;
+declare var ERR_NO_BODYPART;
+declare var ERR_NOT_ENOUGH_EXTENSIONS;
+declare var ERR_RCL_NOT_ENOUGH;
+declare var ERR_GCL_NOT_ENOUGH;
 
-
+declare type GameObject = ConstructionSite|Creep|Energy|Flag|Source|Spawn|Structure;
+declare var global:any;

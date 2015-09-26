@@ -1,31 +1,34 @@
-module.exports = {
-	waitTimeout: 10,
-
-	/** @param {Creep} creep */
-	fits: function(creep) {
-		return creep.carry.energy < 10 &&
-			creep.bodyScore([WORK, WORK, CARRY, MOVE]) > 0 && 
-			getTarget(creep);
-	},
-
-	/** @param {Creep} creep */
-	finished: creep => creep.carry.energy == creep.carryCapacity,
-
-	/** @param {Creep} creep */
-	run: function(creep) {
-		var toLog = creep.room.name != "W12S28";
-		if (toLog)
-			console.log('harvester getTarget(' + creep + ')');
-		var s = getTarget(creep);
-		if (toLog)
-			console.log("harvester to " + s);
-		return creep.approachAndDo(s, () => creep.harvest(s), true);
-	}	
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
 };
-
-/** @param {Creep} creep */
-function getTarget(creep){
-	return creep.pos.findClosestByPath(FIND_SOURCES, { filter: 
-			s => (s.energy > 0 || s.ticksToRegeneration < 10) && s.pos.canAssign(creep)
-		});
-}
+var Role = require('Role');
+var Harvester = (function (_super) {
+    __extends(Harvester, _super);
+    function Harvester() {
+        _super.apply(this, arguments);
+    }
+    Harvester.prototype.fits = function (creep) {
+        return creep.carry.energy < 10 && creep.bodyScore([WORK, WORK, CARRY, MOVE]) > 0 && _super.prototype.fits.call(this, creep);
+    };
+    Harvester.prototype.finished = function (creep) {
+        return creep.carry.energy == creep.carryCapacity;
+    };
+    Harvester.prototype.getTarget = function (creep) {
+        var _this = this;
+        return creep.pos.findClosestByPath(FIND_SOURCES, {
+            filter: function (s) { return _this.isTargetActual(creep, s) && s.pos.canAssign(creep); }
+        });
+    };
+    Harvester.prototype.isTargetActual = function (creep, target) {
+        return target && target.energy && (target.energy > 0 || target.ticksToRegeneration < 10);
+    };
+    Harvester.prototype.interactWithTarget = function (creep, target) {
+        return creep.harvest(target);
+    };
+    return Harvester;
+})(Role);
+module.exports = Harvester;
+//# sourceMappingURL=role-harvester.js.map
