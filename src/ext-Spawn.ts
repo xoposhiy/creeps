@@ -29,7 +29,7 @@ Spawn.prototype.controlSpawn = function (){
 };
 
 function wantToSpawn(spawn){
-    var creepsCount = _.values(Game.creeps).length;
+    var creepsCount = spawn.room.find(FIND_MY_CREEPS).length;
     if (creepsCount >= 20) {
         return false;
     }

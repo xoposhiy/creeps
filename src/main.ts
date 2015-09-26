@@ -7,6 +7,12 @@ import roles = require('roles');
 
 Profiler.start();
 
+global.c = function(role){
+    var creep = <Creep>_.values(Game.creeps)[0];
+    if (role) creep = creep.getCreepsByRole()[role][0];
+    return creep;
+}
+
 export var loop = main;
 
 function main() {
@@ -15,11 +21,19 @@ function main() {
         bodyparts: _.reduce(_.values(Game.creeps), (s:number, c:Creep) => s + c.body.length, 0)
     };
 
-    _.forEach(Game.spawns, spawn => spawn.controlSpawn());
+    _.forEach(Game.spawns, spawn => spawn.controlSpawn ? spawn.controlSpawn() : undefined);
 
-    _.forEach(Game.creeps, creep => {
+    _.forEach(Game.creeps, (creep, name) => {
+        if (!creep){
+            console.log('strange creep ' + name);
+            return;
+        }
         if (creep.spawning) return;
         var roleImpl = roles.impl[creep.memory.role || 'no'];
+        if (!roleImpl){
+            console.log('strange role ' + creep.memory.role);
+            return;
+        }
         roleImpl.controlCreep(creep);
         if (Game.time % 4 == 0)
             creep.say(creep.memory.role);

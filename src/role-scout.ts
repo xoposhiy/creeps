@@ -16,7 +16,10 @@ class Scout extends Role {
     }
 
     getTarget(creep:Creep):RoomPosition {
-        return <RoomPosition>creep.pos.findClosestByPath(FIND_EXIT_TOP, {filter: pos => pos.canAssign(creep)});  //TODO fix!
+        //var dir = creep.memory.scoutExitDirection || [FIND_EXIT_TOP, FIND_EXIT_BOTTOM, FIND_EXIT_LEFT, FIND_EXIT_RIGHT][Game.time%4];
+        var dir = creep.memory.scoutExitDirection || FIND_EXIT_TOP;
+        creep.memory.scoutExitDirection = dir;
+        return <RoomPosition>creep.pos.findClosestByPath(dir, {filter: pos => pos.canAssign(creep)});
     }
 
     finished(creep:Creep):boolean {

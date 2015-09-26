@@ -3,7 +3,7 @@ import Role = require('Role');
 class Returner extends Role {
 
     fits(creep:Creep):boolean {
-        return !creep.room.controller.my && creep.bodyScore([MOVE]) > 0;
+        return (!creep.room.controller || !creep.room.controller.my) && creep.bodyScore([MOVE]) > 0;
     }
 
     isTargetActual():boolean {
@@ -15,7 +15,7 @@ class Returner extends Role {
     }
 
     finished(creep:Creep):boolean {
-        return creep.room.controller.my;
+        return creep.room.controller && creep.room.controller.my;
     }
 
     interactWithTarget(creep:Creep, target:any):any {

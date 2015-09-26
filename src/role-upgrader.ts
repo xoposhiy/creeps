@@ -5,6 +5,7 @@ class Upgrader extends Role {
 
     fits(creep:Creep):boolean {
         return creep.carry.energy == creep.carryCapacity &&
+            creep.room.controller &&
             creep.room.controller.my &&
             creep.bodyScore([MOVE, CARRY, WORK]) > 0 &&
             !creep.room.isSpawningTime() &&
@@ -16,11 +17,12 @@ class Upgrader extends Role {
     }
 
     getTarget(creep:Creep):any {
+        if (!creep.room.controller) return undefined;
         return creep.room.controller.pos.canAssign(creep) ? creep.room.controller : undefined;
     }
 
     finished(creep:Creep):boolean {
-        return creep.carry.energy == 0 || !creep.room.controller.my;
+        return creep.carry.energy == 0 || !creep.room.controller || !creep.room.controller.my;
     }
 
     interactWithTarget(creep:Creep, target:any):any {

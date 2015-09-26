@@ -39,6 +39,7 @@ interface CreepMemory {
     targetPosition: {roomName:string; x:number; y:number};
     done: boolean;
     startWaitTime: number;
+    scoutExitDirection: number;
 }
 
 interface SpawnMemory {

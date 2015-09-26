@@ -405,7 +405,7 @@ interface Room {
      * @returns The room direction constant, one of the following: FIND_EXIT_TOP, FIND_EXIT_RIGHT, FIND_EXIT_BOTTOM, FIND_EXIT_LEFT
      * Or one of the following error codes: ERR_NO_PATH, ERR_INVALID_ARGS
      */
-    findExitTo(room:string|Room): string|number;
+    findExitTo(room:string|Room): number;
     /**
      * Find an optimal path inside the room between fromPos and toPos using A* search algorithm.
      * @param fromPos The start position.
@@ -427,13 +427,13 @@ interface Room {
      * @param y The Y position.
      * @returns An array with objects at the specified position
      */
-    lookAt(x:number, y:number): LookAtResult;
+    lookAt(x:number, y:number): LookAtResult[];
     /**
      * Get the list of objects at the specified room position.
      * @param target Can be a RoomPosition object or any object containing RoomPosition.
      * @returns An array with objects at the specified position
      */
-    lookAt(target:RoomPosition|{pos: RoomPosition}) : LookAtResult;
+    lookAt(target:RoomPosition|{pos: RoomPosition}) : LookAtResult[];
     /**
      * Get the list of objects at the specified room area. This method is more CPU efficient in comparison to multiple lookAt calls.
      * @param top The top Y boundary of the area.
@@ -500,7 +500,7 @@ interface RoomPosition {
     look(): LookAtResult;
     lookFor<T>(type:string): T[];
 }
-declare var Source:any;
+declare var Structure:any;
 interface Source {
     energy: number;
     energyCapacity: number;

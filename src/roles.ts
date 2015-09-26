@@ -3,7 +3,7 @@
 import Profiler = require('profiler');
 import roleLoader = require("jsRoleLoader");
 
-var allRoles = ['builder', 'cargo', 'harvester', 'hungry', 'no', 'reservator', 'returner', 'upgrader', 'scout'];
+var allRoles = ['builder', 'cargo', 'harvester', 'hungry', 'no', 'reservator', 'returner', 'upgrader', 'scout', 'claimer', 'flag'];
 
 var roles = {
     impl: _.zipObject(_.map(allRoles, r => [r, roleLoader['load'](r)])),
@@ -40,18 +40,20 @@ function getNewRole(creep){
         totalCreeps = totalCreeps || 0;
         if (!creeps[role]) console.log("unknown " + role);
         return (_.values(Game.creeps).length >= totalCreeps &&
-        creeps[role].length < maxCreepsThisRole &&
-        roles.impl[role].fits(creep)) ?
-            role : undefined;
+            _.filter(creeps[role], (c:Creep) => c.room.name == creep.room.name).length < maxCreepsThisRole &&
+            roles.impl[role].fits(creep)) ?
+                role : undefined;
     };
     var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES).length;
     return (
+        tryRole('flag') ||
         tryRole('harvester') ||
         tryRole('builder', constructionSites/2 + 1) ||
         tryRole('upgrader') ||
         tryRole('cargo', 3) ||
         tryRole('hungry') ||
         tryRole('returner') ||
+        tryRole('builder') ||
         tryRole('reservator') ||
         tryRole('scout') ||
         'no'
