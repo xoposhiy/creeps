@@ -2,7 +2,11 @@
   <dictionary name="pe">
     <words>
       <w>bodypart</w>
+      <w>bodyparts</w>
+      <w>eslint</w>
+      <w>lodash</w>
       <w>reservator</w>
+      <w>screeps</w>
       <w>storages</w>
       <w>upgrader</w>
     </words>

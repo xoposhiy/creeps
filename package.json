@@ -31,7 +31,11 @@
   "eslintConfig": {
     "extends": "eslint:recommended",
     "ecmaFeatures": {
-      "arrowFunctions": true
+      "arrowFunctions": true,
+      "forOf": true,
+      "classes": true,
+      "blockBindings": true,
+      "modules": true
     },
     "rules": {
       "no-console": 0,

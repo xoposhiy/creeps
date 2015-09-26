@@ -1,7 +1,6 @@
 ///<reference path="screeps.d.ts"/>
 
-declare module "role-loader" {
-}
+declare module "jsRoleLoader" {}
 
 interface Creep {
     approachAndDo(target:GameObject|RoomPosition, interact:any, log?:boolean):boolean;

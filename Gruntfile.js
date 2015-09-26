@@ -11,7 +11,7 @@ module.exports = function(grunt) {
 		screeps: {
 			options: options,
 			dist: {
-				src: ['src/*.js']
+				src: ['src/*.js', 'src/*.js.map']
 			}
 		},
 		eslint: {

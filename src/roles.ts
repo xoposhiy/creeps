@@ -1,7 +1,7 @@
 ///<reference path="screeps-extended.d.ts"/>
 
 import Profiler = require('profiler');
-import roleLoader = require("role-loader");
+import roleLoader = require("jsRoleLoader");
 
 var allRoles = ['builder', 'cargo', 'harvester', 'hungry', 'no', 'reservator', 'returner', 'upgrader', 'scout'];
 
