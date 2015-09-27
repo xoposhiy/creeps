@@ -10,9 +10,13 @@ creep.assignNewRole = function (role) {
 
 creep.getCreepsByRole = roles.getCreepsByRole;
 
-creep.takeEnergyFrom = function (obj) {
-    if (obj.transferEnergy !== undefined) return obj.transferEnergy(this);
-    else return this.pickup(obj);
+creep.takeEnergyFrom = function (obj:GameObject) {
+    if (obj instanceof Energy) return this.pickup(<Energy>obj);
+    if (obj instanceof Source) return this.harvest(<Source>obj);
+    if (obj['transferEnergy'])
+        return obj['transferEnergy'](this);
+    else
+        throw new Error("Can't take energy from " + obj);
 };
 
 creep.bodyScore = function (requiredParts) {

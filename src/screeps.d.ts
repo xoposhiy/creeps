@@ -500,7 +500,7 @@ interface RoomPosition {
     look(): LookAtResult;
     lookFor<T>(type:string): T[];
 }
-declare var Structure:any;
+declare var Source:any;
 interface Source {
     energy: number;
     energyCapacity: number;

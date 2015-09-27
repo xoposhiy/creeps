@@ -12,11 +12,14 @@ function loadRole(roleName){
 }
 var roles = {
     impl: _.zipObject(_.map(allRoles, r => [r, loadRole(r)])),
+    implClass: _.zipObject(_.map(allRoles, r => [r, roleLoader['load'](r)])),
     assignNewRole: assignNewRole,
     getCreepsByRole: getCreepsByRole
 };
 
-function getCreepsByRole(){
+function getCreepsByRole(role?:string){
+    if (role)
+        return getCreepsByRole()[role];
     var creeps = _.values(Game.creeps);
     var res = _.map(allRoles, r => [r, _.filter(creeps, (c: Creep) => c.memory && c.memory.role == r)]);
     return _.zipObject(res);

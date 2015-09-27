@@ -1,21 +1,12 @@
 ///<reference path="screeps-extended.d.ts"/>
 
 import Profiler = require('profiler');
-import ext = require("ext");
-ext;
+import ext = require("ext"); ext.extend();
 import roles = require('roles');
+import debug = require('debug'); debug.populate(global);
 
 Profiler.start();
 
-if (global) {
-    global.c = function (role) {
-        var creep = <Creep>_.values(Game.creeps)[0];
-        if (role) creep = creep.getCreepsByRole()[role][0];
-        return creep;
-    };
-    global.Profiler = Profiler;
-    //global.b = roles.impl['builder'];
-}
 export var loop = main;
 
 function main() {

@@ -4,8 +4,10 @@ import roomPos = require("ext-RoomPosition");
 import spawn = require("ext-Spawn");
 import structure = require("ext-Structure");
 
-room;
-creep;
-roomPos;
-spawn;
-structure;
+export function extend() {
+    return room.success &&
+        creep.success &&
+        roomPos.success &&
+        spawn.success &&
+        structure.success;
+}
