@@ -7,12 +7,15 @@ import roles = require('roles');
 
 Profiler.start();
 
-global.c = function(role){
-    var creep = <Creep>_.values(Game.creeps)[0];
-    if (role) creep = creep.getCreepsByRole()[role][0];
-    return creep;
+if (global) {
+    global.c = function (role) {
+        var creep = <Creep>_.values(Game.creeps)[0];
+        if (role) creep = creep.getCreepsByRole()[role][0];
+        return creep;
+    };
+    global.Profiler = Profiler;
+    //global.b = roles.impl['builder'];
 }
-
 export var loop = main;
 
 function main() {

@@ -25,18 +25,29 @@ class Builder extends Role{
             return creep.repair(<Structure>target);
     }
 
-    scoreBuildTarget(creep: Creep, t:any) {
-        var hits = t.hits || 0;
-        var maxHits = Math.min(150000, t.hitsMax || 1);
-        var repairBonus = 20.0 * hits / maxHits;
-        var buildingBonus = t.progressTotal ? -20 - (20.0 * t.progress || 0) / (t.progressTotal || 1) : 0;
-        var range = t.pos.getRangeTo(creep.pos);
-        var rangeBonus = range <= 1 ? -5 : 0;
-        return range + rangeBonus + repairBonus + buildingBonus;
+    scoreBuildTarget(creep: Creep, t:GameObject) {
+        var range = t.pos.getRangeTo(creep.pos) * 500;
+        console.log('progressTotal ' + t['progressTotal']);
+        if (t['progressTotal']){
+            var construction = <ConstructionSite>t;
+            var cost = (construction.progressTotal - construction.progress) + range;
+            console.log('cost ' + cost);
+            return cost;
+        }
+        else{
+            var structure = <Structure>t;
+            return this.shouldRepair(structure) ? structure.hits + range : Number.MAX_VALUE
+        }
     }
+
+    private shouldRepair(structure: Structure){
+        var repairThreshold = Math.max(0.25 * structure.hitsMax, structure.hitsMax - 10000);
+        return structure.hits < repairThreshold;
+    }
+
     getTarget(creep:Creep):GameObject {
         var targets = creep.room.find(FIND_CONSTRUCTION_SITES).
-            concat(creep.room.find(FIND_STRUCTURES, {filter: s => s.hits <  Math.min(150000, 2*s.hitsMax/3.0) && s.pos.canAssign(creep)}));
+            concat(creep.room.find(FIND_STRUCTURES, {filter: s => this.shouldRepair(s) && s.pos.canAssign(creep)}));
         targets = _.sortBy(targets, t => this.scoreBuildTarget(creep, t));
         return <GameObject>targets[0];
     }

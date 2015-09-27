@@ -1,6 +1,5 @@
 function loadRole(roleName){
-    var Role = require("role-" + roleName);
-    return new Role();
+    return require("role-" + roleName);
 }
 
 module.exports.load = loadRole;

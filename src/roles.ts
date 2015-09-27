@@ -5,8 +5,13 @@ import roleLoader = require("jsRoleLoader");
 
 var allRoles = ['builder', 'cargo', 'harvester', 'hungry', 'no', 'reservator', 'returner', 'upgrader', 'scout', 'claimer', 'flag'];
 
+function loadRole(roleName){
+    var roleClass = roleLoader['load'](roleName);
+    //Profiler.wrapAll(roleClass);
+    return new roleClass();
+}
 var roles = {
-    impl: _.zipObject(_.map(allRoles, r => [r, roleLoader['load'](r)])),
+    impl: _.zipObject(_.map(allRoles, r => [r, loadRole(r)])),
     assignNewRole: assignNewRole,
     getCreepsByRole: getCreepsByRole
 };
@@ -48,7 +53,7 @@ function getNewRole(creep){
     return (
         tryRole('flag') ||
         tryRole('harvester') ||
-        tryRole('builder', constructionSites/2 + 1) ||
+        tryRole('builder', constructionSites + 1) ||
         tryRole('upgrader') ||
         tryRole('cargo', 3) ||
         tryRole('hungry') ||

@@ -14,14 +14,7 @@ class Flag extends Role {
 
     getTarget(creep:Creep):GameObject|RoomPosition {
         var flag = Game.flags['here'];
-        if (!flag)
-            console.log("no flags.here found!");
-        else if (!flag.room)
-            console.log("flags.here.room is unknown yet");
-        else if (flag.roomName != creep.room.name)
-            console.log("flags.here.room is " + flag.roomName + ' while should be ' + creep.room.name);
-        else
-            return flag.pos;
+        if (flag && flag.room && flag.room.name == creep.room.name) return flag.pos;
         return undefined;
     }
 
@@ -30,7 +23,7 @@ class Flag extends Role {
     }
 
     interactWithTarget(creep:Creep, target:GameObject):any {
-        console.log('flag came to ' + target);
+        console.log('flag-creep came to ' + target);
         return creep.say('Im here!');
     }
 }

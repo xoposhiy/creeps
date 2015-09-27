@@ -52,8 +52,12 @@ class Profiler{
     static stop(){
         _.forEach(Profiler.profilingTargets, Profiler.unwrapAll);
         var report = Profiler.report();
-        Memory.usedCpu = {};
+        Profiler.reset();
         return report;
+    }
+
+    static reset(){
+        Memory.usedCpu = {};
     }
 
     static report(){
@@ -69,12 +73,11 @@ class Profiler{
         for (n in Memory.usedCpu) {
             p = Memory.usedCpu[n];
             if (p.usage == 0) continue;
-            lines.push({name: n, usage: p.usage, count: p.count, average: p.average});
+            lines.push({name: _.padLeft(n, 30), usage: Math.round(p.usage), count: p.count, average: Math.round(p.average)});
         }
         lines = _.sortBy(lines, 'usage').reverse();
-        return "name\tusage\tcount\taverage\n" +
-            _.map(lines, line => _.values(line).join('\t')).join('\n');
+        return _.padLeft("name", 30) + " usage count average\n" +
+            _.map(lines.slice(0, 20), line => _.values(line).join(' ')).join('\n');
     }
-
 }
 export = Profiler;
