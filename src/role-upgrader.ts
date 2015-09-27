@@ -4,7 +4,7 @@ class Upgrader extends Role {
 
 
     fits(creep:Creep):boolean {
-        return creep.carry.energy == creep.carryCapacity &&
+        return creep.carry.energy > 0 &&
             creep.room.controller &&
             creep.room.controller.my &&
             creep.bodyScore([MOVE, CARRY, WORK]) > 0 &&

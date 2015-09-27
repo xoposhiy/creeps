@@ -5,7 +5,7 @@ import Role = require('Role');
 class Builder extends Role{
 
     fits(creep:Creep):boolean {
-        return creep.carry.energy == creep.carryCapacity &&
+        return creep.carry.energy > 0 &&
             creep.bodyScore([MOVE, CARRY, WORK]) > 0 && !creep.room.isSpawningTime() &&
             super.fits(creep);
     }
@@ -26,12 +26,10 @@ class Builder extends Role{
     }
 
     scoreBuildTarget(creep: Creep, t:GameObject) {
-        var range = t.pos.getRangeTo(creep.pos) * 500;
-        console.log('progressTotal ' + t['progressTotal']);
+        var range = t.pos.getRangeTo(creep.pos) * 200;
         if (t['progressTotal']){
             var construction = <ConstructionSite>t;
             var cost = (construction.progressTotal - construction.progress) + range;
-            console.log('cost ' + cost);
             return cost;
         }
         else{
@@ -49,7 +47,10 @@ class Builder extends Role{
         var targets = creep.room.find(FIND_CONSTRUCTION_SITES).
             concat(creep.room.find(FIND_STRUCTURES, {filter: s => this.shouldRepair(s) && s.pos.canAssign(creep)}));
         targets = _.sortBy(targets, t => this.scoreBuildTarget(creep, t));
-        return <GameObject>targets[0];
+        var target = <GameObject>targets[0];
+        if (target)
+            console.log("BUILD Target " + target + ' at ' + target.pos + ' cost ' + this.scoreBuildTarget(creep, target));
+        return target;
     }
 }
 

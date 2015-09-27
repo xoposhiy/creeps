@@ -12,18 +12,26 @@ class Harvester extends Role {
         return creep.carry.energy == creep.carryCapacity;
     }
 
-    getTarget(creep:Creep): Source {
-        return <Source>creep.pos.findClosestByPath(FIND_SOURCES, {
-            filter: (s:GameObject) => this.isTargetActual(creep, <Source>s) && s.pos.canAssign(creep)
+    getTarget(creep:Creep): Source|Energy {
+        var energy = <Energy>creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
+            filter: (e:Energy) => e.energy >= 50 && e.pos.canAssign(creep)
         });
+        if (energy) {
+            console.log('harvest dropped energy at ' + energy.pos);
+            return energy;
+        }
+        var source = <Source>creep.pos.findClosestByPath(FIND_SOURCES, {
+            filter: (s:Source) => this.isTargetActual(creep, s) && s.pos.canAssign(creep)
+        });
+        return source;
     }
 
-    isTargetActual(creep:Creep, target:Source):boolean {
-        return target && target.energy && (target.energy > 0 || target.ticksToRegeneration < 10);
+    isTargetActual(creep:Creep, target:Source|Energy):boolean {
+        return target && target.energy && target.energy > 0;
     }
 
-    interactWithTarget(creep:Creep, target:Source) {
-        return creep.harvest(target);
+    interactWithTarget(creep:Creep, target:Source|Energy) {
+        return creep.takeEnergyFrom(target);
     }
 }
 

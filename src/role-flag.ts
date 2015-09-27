@@ -2,7 +2,7 @@
 
 import Role = require('Role');
 
-class Flag extends Role {
+class FlagCatcher extends Role {
 
     fits(creep:Creep):boolean {
         return super.fits(creep);
@@ -13,19 +13,23 @@ class Flag extends Role {
     }
 
     getTarget(creep:Creep):GameObject|RoomPosition {
-        var flag = Game.flags['here'];
+        var flag = this.flag();
         if (flag && flag.room && flag.room.name == creep.room.name) return flag.pos;
         return undefined;
     }
+    private flag(){
+        return Game.flags['CTF'];
+    }
 
-    finished(creep:Creep):boolean {
-        return !Game.flags['here'] || creep.pos.isNearTo(Game.flags['here'].pos);
+    finished():boolean {
+        var flag = this.flag();
+        return !flag;
     }
 
     interactWithTarget(creep:Creep, target:GameObject):any {
         console.log('flag-creep came to ' + target);
-        return creep.say('Im here!');
+        return this.flag() && (this.flag().remove() == OK);
     }
 }
 
-export = Flag;
+export = FlagCatcher;
