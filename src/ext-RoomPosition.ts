@@ -42,7 +42,7 @@ roomPos.assign = function (creep) {
 };
 
 function isAssigned(creepId, pos){
-    var creep = Game.getObjectById(creepId);
+    var creep = <Creep>Game.getObjectById(creepId);
     return creep && creep.memory.targetPos == pos.toString();
 }
 

@@ -28,3 +28,4 @@ node_modules
 /credentials.js
 /.sublime-grunt.cache
 /.idea/workspace.xml
+/dist

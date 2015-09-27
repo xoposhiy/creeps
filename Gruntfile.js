@@ -1,24 +1,32 @@
 module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-screeps');
+	grunt.loadNpmTasks('grunt-typescript');
+
 	var options = require('./credentials');
 	
-	require('load-grunt-tasks')(grunt);
-
 	options.branch = 'default';
 
 	grunt.initConfig({
 		screeps: {
 			options: options,
 			dist: {
-				src: ['src/*.js', 'src/*.js.map']
+				src: ['dist/*.*']
 			}
 		},
-		eslint: {
-			target: ['src/*.js']
+		typescript: {
+			compile: {
+				src: ['src/**/*.ts'],
+				dest: 'dist',
+				options: {
+					module: 'commonjs',
+					target: 'es5'
+				}
+			}
 		}
 
 	});
 
-	grunt.registerTask('default', ['eslint', 'screeps']);
+	grunt.registerTask('default', ['typescript', 'screeps']);
+	grunt.registerTask('compile', ['typescript']);
 };

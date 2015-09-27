@@ -1,18 +1,17 @@
 ///<reference path="screeps-extended.d.ts"/>
 
 import Profiler = require('profiler');
-import roleLoader = require("jsRoleLoader");
 
 var allRoles = ['builder', 'cargo', 'harvester', 'hungry', 'no', 'reservator', 'returner', 'upgrader', 'scout', 'claimer', 'flag'];
 
 function loadRole(roleName){
-    var roleClass = roleLoader['load'](roleName);
+    var roleClass = global['require']('role-' + roleName);
     //Profiler.wrapAll(roleClass);
     return new roleClass();
 }
 var roles = {
     impl: _.zipObject(_.map(allRoles, r => [r, loadRole(r)])),
-    implClass: _.zipObject(_.map(allRoles, r => [r, roleLoader['load'](r)])),
+    implClass: _.zipObject(_.map(allRoles, r => [r, global['require']('role-' + r)])),
     assignNewRole: assignNewRole,
     getCreepsByRole: getCreepsByRole
 };
