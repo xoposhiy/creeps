@@ -30,6 +30,8 @@ interface Memory {
     assignedCreeps: {[pos: string]: Array<string>};
     usedCpu: Object;
     stats: any;
+    statsAct: number;
+    statsHang: number;
 }
 interface CreepMemory {
     role: string;

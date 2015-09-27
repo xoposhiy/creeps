@@ -6,7 +6,8 @@ class Builder extends Role{
 
     fits(creep:Creep):boolean {
         return creep.carry.energy > 0 &&
-            creep.bodyScore([MOVE, CARRY, WORK]) > 0 && !creep.room.isSpawningTime() &&
+            creep.bodyScore([MOVE, CARRY, WORK]) > 0 &&
+            !creep.room.isSpawningTime() &&
             super.fits(creep);
     }
 

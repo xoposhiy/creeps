@@ -2,7 +2,7 @@
 
 import Profiler = require('profiler');
 
-var allRoles = ['builder', 'cargo', 'harvester', 'hungry', 'no', 'reservator', 'returner', 'upgrader', 'scout', 'claimer', 'flag'];
+var allRoles = ['builder', 'cargo', 'harvester', 'hungry', 'no', 'reservator', 'returner', 'upgrader', 'scout', 'claimer', 'flag', 'ranger', 'warrior'];
 
 function loadRole(roleName){
     var roleClass = global['require']('role-' + roleName);
@@ -31,9 +31,9 @@ function assignNewRole(creep, finished) {
     var oldRole = creep.memory.role;
     creep.memory = {};
     var newRole = getNewRole(creep);
-    console.log(Game.time + " ROLE " + _.padLeft(oldRole, 12) + " -> " + _.padRight(newRole, 12) +
-        " " + creep + " " + creep.pos +
-        (finished ? "" : " TIMEOUT"));
+    //console.log(Game.time + " ROLE " + _.padLeft(oldRole, 12) + " -> " + _.padRight(newRole, 12) +
+    //    " " + creep + " " + creep.pos +
+    //    (finished ? "" : " TIMEOUT"));
     creep.say("!" + newRole);
     creep.memory = { role: newRole };
 }
@@ -51,18 +51,30 @@ function getNewRole(creep){
             roles.impl[role].fits(creep)) ?
                 role : undefined;
     };
+
+    var oneOf = (...roleNames:string[]) => {
+        var t = Game.time;
+        for(var i = 0; i<roleNames.length; i++) {
+            var res = tryRole(roleNames[(i + t) % roleNames.length]);
+            if (res) return res;
+        }
+        return undefined;
+    };
+
     var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES).length;
     return (
         tryRole('flag') ||
+        tryRole('warrior') ||
+        //no energy:
         tryRole('harvester') ||
+        oneOf('hungry', 'scout') ||
+        // has energy:
+        tryRole('returner') ||
         tryRole('builder', constructionSites + 1) ||
         tryRole('upgrader') ||
-        tryRole('cargo', 3) ||
-        tryRole('hungry') ||
-        tryRole('returner') ||
-        tryRole('builder') ||
+        tryRole('cargo', 3) || //TODO remove constant. How?!
         tryRole('reservator') ||
-        tryRole('scout') ||
+        tryRole('builder') ||
         'no'
     );
 }

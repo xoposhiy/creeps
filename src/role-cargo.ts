@@ -3,7 +3,7 @@ import Role = require('Role');
 class Cargo extends Role {
 
     fits(creep:Creep):boolean {
-        return creep.carry.energy == creep.carryCapacity &&
+        return creep.carry.energy > 0 &&
             creep.bodyScore([MOVE, CARRY]) > 0 &&
             !creep.room.isSpawningTime() &&
             super.fits(creep);
@@ -26,11 +26,13 @@ class Cargo extends Role {
     }
 
     finished(creep:Creep):boolean {
-        return creep.carry.energy == 0;
+        return creep.carry.energy == 0 || creep.memory.done;
     }
 
     interactWithTarget(creep:Creep, target:any):any {
-        return creep.transferEnergy(target);
+        var result = creep.transferEnergy(target);
+        creep.memory.done = result == OK;
+        return result;
     }
 }
 

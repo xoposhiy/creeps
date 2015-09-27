@@ -247,6 +247,12 @@ interface Game {
      * An amount of available CPU time at the current game tick.
      */
     cpuLimit: number;
+
+    /**
+     * Your Global Control Level, an object with the following properties:
+     */
+    gcl: {level: number; progress: number; progressTotal:number};
+
     /**
      * A hash containing all your creeps with creep names as hash keys.
      */

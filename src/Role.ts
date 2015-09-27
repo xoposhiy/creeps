@@ -44,9 +44,11 @@ class Role {
         }
     }
 
+    moveOnTarget = false;
+
     run(creep:Creep):boolean {
         var target = this.getCachedTarget(creep);
-        var res = creep.approachAndDo(target, () => this.interactWithTarget(creep, target), true);
+        var res = creep.approachAndDo(target, () => this.interactWithTarget(creep, target), this.moveOnTarget);
         creep.memory.rawTarget = target;
         creep.memory.targetId = undefined;
         creep.memory.targetPosition = undefined;

@@ -24,21 +24,26 @@ creep.bodyScore = function (requiredParts) {
     return _.reduce(requiredParts, (score, p) => score * creep.getActiveBodyparts(p), 1);
 };
 
-creep.approachAndDo = function (target, work, log) {
+creep.approachAndDo = function (target, work, moveOnTarget) {
     var creep = this;
     if (!target) return false;
     var targetPos = target.pos || target;
     if (!targetPos.assign(creep)) return false;
-    if (creep.pos.isNearTo(targetPos)) {
+    if (!moveOnTarget && creep.pos.isNearTo(targetPos) || creep.pos.isEqualTo(targetPos)) {
         var res = work();
-        return _.isNumber(res) ? res === OK : res;
+        var success = _.isNumber(res) ? res === OK : res;
+        Memory[success ? 'statsAct' : 'statsHang']++;
+        return success;
     }
-    else if (creep.fatigue > 0) return true;
+    else if (creep.fatigue > 0) {
+        Memory.statsHang++;
+        return true;
+    }
     else {
         var moveRes = creep.moveTo(target);
-        if (moveRes != OK && log)
-            console.log("moveTo " + target + " " + targetPos + " from " + creep.pos + ": " + moveRes);
+        Memory.statsHang++;
         return moveRes == OK;
     }
 };
+
 export var success = true;

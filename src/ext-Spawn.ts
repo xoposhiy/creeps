@@ -1,6 +1,7 @@
 ///<reference path="screeps-extended.d.ts"/>
 
 var bodyPriority = [WORK, MOVE, CARRY];
+var bodyWarriorPriority = [ATTACK, MOVE];
 
 var price = {};
 price[WORK]= 100;
@@ -16,11 +17,12 @@ Spawn.prototype.controlSpawn = function (){
     spawn.memory.wantToSpawn = wantToSpawn(spawn);
     if (!spawn.memory.wantToSpawn) return;
     if (Game.time % 5 == 0)
-        console.log(Game.time + " SPAWN want to! (nextSpawnTime: " + spawn.memory.nextSpawnTime + ", creeps: " + Memory.stats.creeps + ")");
+        console.log(Game.time + " SPAWN " + spawn.name + " #creeps " + spawn.room.find(FIND_MY_CREEPS).length + (spawn.memory['wantWarrior'] ? " want Warrior!" : ""));
     var maxEnergy = getTotalEnergyCapacity(this);
-    var body = getNextCreepBody(maxEnergy);
+    var body = getNextCreepBody(spawn, maxEnergy);
     var canCreate = this.canCreateCreep(body);
     if (canCreate == OK){
+        spawn.memory['wantWarrior'] = undefined;
         console.log("SPAWN creep #" + (Memory.stats.creeps+1) + " body: " + body);
         spawn.memory.nextSpawnTime = Game.time + 50;
         clearDeadCreepsMemory();
@@ -43,14 +45,19 @@ function getTotalEnergyCapacity(spawn){
     return _.reduce(spawnOrExtensions, (total, s:Extension|Spawn) => total + s.energyCapacity, 0);
 }
 
-function getNextCreepBody(maxEnergy){
+function getNextCreepBody(spawn:Spawn, maxEnergy:number){
+    var bp = bodyPriority;
+    spawn.memory['wantWarrior'] = spawn.memory['wantWarrior'] || spawn.room.find(FIND_CREEPS, {filter: c => c.getActiveBodyparts(ATTACK) > 0}).length == 0;
+    if (spawn.memory['wantWarrior']){
+        bp = bodyWarriorPriority;
+    }
     var workCount = _.reduce(Game.creeps, (res, c) => res + c.getActiveBodyparts(WORK), 0);
     var i = 0;
     var bodyWork = 0;
     var body = [];
     var cost = 0;
     while (true){
-        var nextPart = bodyPriority[i++ % bodyPriority.length];
+        var nextPart = bp[i++ % bp.length];
         cost += price[nextPart];
         if (cost > maxEnergy - 50) return body;
         if (nextPart == WORK) bodyWork++;

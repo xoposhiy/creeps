@@ -4,16 +4,16 @@ import Profiler = require('profiler');
 import ext = require("ext"); ext.extend();
 import roles = require('roles');
 import debug = require('debug'); debug.populate(global);
+import statistics = require('statistics');
+
+global.stats = statistics.stats;
 
 Profiler.start();
 
 export var loop = main;
 
 function main() {
-    Memory.stats = {
-        creeps: _.values(Game.creeps).length,
-        bodyparts: _.reduce(_.values(Game.creeps), (s:number, c:Creep) => s + c.body.length, 0)
-    };
+    statistics.stats.onTick();
 
     _.forEach(Game.spawns, spawn => spawn.controlSpawn ? spawn.controlSpawn() : undefined);
 

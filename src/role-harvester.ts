@@ -16,10 +16,8 @@ class Harvester extends Role {
         var energy = <Energy>creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
             filter: (e:Energy) => e.energy >= 50 && e.pos.canAssign(creep)
         });
-        if (energy) {
-            console.log('harvest dropped energy at ' + energy.pos);
+        if (energy)
             return energy;
-        }
         var source = <Source>creep.pos.findClosestByPath(FIND_SOURCES, {
             filter: (s:Source) => this.isTargetActual(creep, s) && s.pos.canAssign(creep)
         });
