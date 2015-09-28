@@ -10,12 +10,14 @@ class Ranger extends Role {
         return super.fits(creep);
     }
 
-    isTargetActual():boolean {
-        return true;
+    isTargetActual(creep:Creep, target:Flag):boolean {
+        return target.roomName == creep.room.name;
     }
 
     getTarget(creep:Creep):GameObject|RoomPosition {
-        return _.filter(Game.flags, (f:Flag) => f.name.substring(0, 3) == "go-" && f.roomName == creep.room.name)[0];
+        var flags = _.filter(Game.flags, (f:Flag) => f.name.substring(0, 3) == "go-" && f.roomName == creep.room.name);
+        var flag = creep.pos.findClosestByPath(flags);
+        return flag;
     }
 
 

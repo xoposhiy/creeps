@@ -52,8 +52,18 @@ function m(what:any, index?:number) {
     return s(obj['memory']);
 }
 
+function r(what:any, roleName:string){
+    var obj = o(what);
+    if (!_.isArray(obj)) obj = [obj];
+    _.forEach(obj, o => {
+        o['memory'] = {role: roleName};
+        console.log(o + ' set to role ' + roleName);
+    });
+}
+
 export function populate(g){
     g.o = o;
     g.s = s;
     g.m = m;
+    g.r = r;
 }

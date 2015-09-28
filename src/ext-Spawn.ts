@@ -1,7 +1,7 @@
 ///<reference path="screeps-extended.d.ts"/>
 
 var bodyPriority = [WORK, MOVE, CARRY];
-var bodyWarriorPriority = [ATTACK, MOVE];
+var bodyWarriorPriority = [MOVE, ATTACK];
 
 var price = {};
 price[WORK]= 100;
@@ -47,7 +47,7 @@ function getTotalEnergyCapacity(spawn){
 
 function getNextCreepBody(spawn:Spawn, maxEnergy:number){
     var bp = bodyPriority;
-    spawn.memory['wantWarrior'] = spawn.memory['wantWarrior'] || spawn.room.find(FIND_CREEPS, {filter: c => c.getActiveBodyparts(ATTACK) > 0}).length == 0;
+    spawn.memory['wantWarrior'] = spawn.memory['wantWarrior'] || spawn.room.find(FIND_MY_CREEPS, {filter: c => c.getActiveBodyparts(ATTACK) > 0}).length == 0;
     if (spawn.memory['wantWarrior']){
         bp = bodyWarriorPriority;
     }

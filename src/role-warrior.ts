@@ -11,15 +11,14 @@ class Warrior extends Role {
         return false;
     }
 
-    getTarget(creep:Creep): Creep|Structure {
-        var enemy = <Creep>creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS, {
+    getTarget(creep:Creep): GameObject {
+        var enemies = creep.room.find(FIND_HOSTILE_CREEPS, {
             filter: (c:Creep) => c.pos.canAssign(creep)
         });
-        if (enemy) return enemy;
-        var structure = <Structure>creep.pos.findClosestByPath(FIND_HOSTILE_STRUCTURES, {
+        var structures = creep.room.find(FIND_HOSTILE_STRUCTURES, {
             filter: (s:Structure) => s.structureType != 'controller' && s.pos.canAssign(creep)
         });
-        return structure;
+        return creep.pos.findClosestByPath(enemies.concat(structures));
     }
 
     isTargetActual(creep:Creep, target:Source|Energy):boolean {
