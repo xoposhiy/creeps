@@ -23,14 +23,14 @@ roomPos.getAssignedCreeps = function () {
     return Memory.assignedCreeps[pos];
 };
 
-roomPos.canAssign = function (creep) {
+roomPos.canAssign = function (creep:Creep) {
     var pos = this;
     var creeps = pos.getAssignedCreeps();
     return creeps.indexOf(creep.id) >= 0 || creeps.length < pos.countEmptyTilesAround();
 };
 
 /** @param {Creep} creep */
-roomPos.assign = function (creep) {
+roomPos.assign = function (creep:Creep) {
     var pos = this;
     var creeps = pos.getAssignedCreeps();
     if (creeps.indexOf(creep.id) < 0) {

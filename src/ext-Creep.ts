@@ -1,16 +1,20 @@
 ///<reference path="screeps-extended.d.ts"/>
 
 import roles = require('roles');
+import Role = require('Role');
 
-var creep = Creep.prototype;
-
-creep.assignNewRole = function (role) {
-    return roles.assignNewRole(this, role);
+Creep.prototype.assignNewRole = function (finished:boolean) : Role {
+    return roles.assignNewRole(this, finished);
 };
 
-creep.getCreepsByRole = roles.getCreepsByRole;
+Creep.prototype.getRole = function () {
+    var roleImpl = roles.impl[this.memory.role || 'no'];
+    return roleImpl || roles.impl['no'];
+};
 
-creep.takeEnergyFrom = function (obj:GameObject) {
+Creep.prototype.getCreepsByRole = roles.getCreepsByRole;
+
+Creep.prototype.takeEnergyFrom = function (obj:GameObject) {
     if (obj instanceof Energy) return this.pickup(<Energy>obj);
     if (obj instanceof Source) return this.harvest(<Source>obj);
     if (obj['transferEnergy'])
@@ -19,30 +23,64 @@ creep.takeEnergyFrom = function (obj:GameObject) {
         throw new Error("Can't take energy from " + obj);
 };
 
-creep.bodyScore = function (requiredParts) {
-    var creep = this;
+Creep.prototype.log = function (message:string) {
+    if (Memory.debug && Memory.debug[this.name])
+        console.log(Game.time % 100 + ' ' + this + ' ' + this.pos + ' ' + this.memory.role + '   ' + message);
+};
+
+Creep.prototype.bodyScore = function (requiredParts: string[]) {
+    var creep = <Creep>this;
     return _.reduce(requiredParts, (score, p) => score * creep.getActiveBodyparts(p), 1);
 };
 
-creep.approachAndDo = function (target, work, moveOnTarget) {
+Creep.prototype.approachAndDo = function (target, work, actRange:number, moveCloser:boolean) {
     var creep = this;
-    if (!target) return false;
-    var targetPos = target.pos || target;
-    if (!targetPos.assign(creep)) return false;
-    if (!moveOnTarget && creep.pos.isNearTo(targetPos) || creep.pos.isEqualTo(targetPos)) {
-        var res = work();
-        var success = _.isNumber(res) ? res === OK : res;
-        Memory[success ? 'statsAct' : 'statsHang']++;
-        return success;
-    }
-    else if (creep.fatigue > 0) {
+    if (!target) {
+        this.log('no target!');
         Memory.statsHang++;
-        return true;
+        return false;
+    }
+    var targetPos = target.pos || target;
+    if (!targetPos.assign(creep)) {
+        this.log('cant be assigned to ' + targetPos);
+        Memory.statsHang++;
+        return false;
+    }
+    var range = creep.pos.getRangeTo(targetPos);
+    var success = true;
+    var acted = false;
+    if (range <= actRange) {
+        var res = work();
+        this.log('ACT ' + targetPos + ' -> ' + res);
+        success = acted = _.isNumber(res) ? res === OK : res;
+    }
+    if (creep.fatigue > 0)
+        this.log('REST ' + targetPos);
+    if (creep.fatigue == 0 && (range > actRange || moveCloser) && !targetPos.isEqualTo(creep.pos)) {
+        var moveRes = creep.moveTo(target);
+        this.log('MOVE ' + targetPos + ' -> ' + moveRes);
+        success = success && moveRes == OK;
+    }
+    Memory[acted ? 'statsAct' : 'statsHang']++;
+    return success;
+};
+
+Creep.prototype.control = function control()
+{
+    var creep = this;
+    if (creep.spawning) return;
+    var role = creep.getRole();
+    if (role.finished(creep))
+        role = creep.assignNewRole(true);
+    if (role.finished(creep)) return; // new role is bad :(
+    if (role.run(creep)) {
+        creep.memory.startWaitTime = undefined;
     }
     else {
-        var moveRes = creep.moveTo(target);
-        Memory.statsHang++;
-        return moveRes == OK;
+        creep.memory.startWaitTime = creep.memory.startWaitTime || Game.time;
+        if (creep.memory.startWaitTime + role.waitTimeout() < Game.time) {
+            creep.assignNewRole(false);
+        }
     }
 };
 

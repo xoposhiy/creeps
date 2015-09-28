@@ -49,7 +49,7 @@ class Builder extends Role{
             concat(creep.room.find(FIND_STRUCTURES, {filter: s => this.shouldRepair(s) && s.pos.canAssign(creep)}));
         targets = _.sortBy(targets, t => this.scoreBuildTarget(creep, t));
         var target = <GameObject>targets[0];
-        if (target)
+        if (target && Memory.debug[creep.name])
             console.log("BUILD Target " + target + ' at ' + target.pos + ' cost ' + this.scoreBuildTarget(creep, target));
         return target;
     }

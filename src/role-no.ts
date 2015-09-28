@@ -1,6 +1,10 @@
 import Role = require('Role');
 
 class NoRole extends Role {
+    run(creep:Creep):boolean {
+        Memory.statsNo++;
+        return false;
+    }
 
     fits():boolean {
         return false;

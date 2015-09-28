@@ -4,6 +4,8 @@ import Role = require('Role');
 
 class Scout extends Role {
 
+    actRange = 0;
+
     fits(creep:Creep):boolean {
         return creep.carry.energy == 0 && creep.ticksToLive > 200 &&
             creep.bodyScore([WORK, CARRY, MOVE, MOVE]) &&
@@ -11,24 +13,26 @@ class Scout extends Role {
     }
 
     isTargetActual(creep:Creep, target:GameObject):boolean {
-        console.log('WAT ' + target);
         return true;
     }
 
     getTarget(creep:Creep):RoomPosition {
-        //var dir = creep.memory.scoutExitDirection || [FIND_EXIT_TOP, FIND_EXIT_BOTTOM, FIND_EXIT_LEFT, FIND_EXIT_RIGHT][Game.time%4];
-        var dir = creep.memory.scoutExitDirection || FIND_EXIT_TOP;
-        creep.memory.scoutExitDirection = dir;
-        return <RoomPosition>creep.pos.findClosestByPath(dir, {filter: pos => pos.canAssign(creep)});
+        creep.memory.scoutStartRoom = creep.room.name;
+        var exits = Game.map.describeExits(creep.room.name);
+        var dirs = _.filter([TOP, BOTTOM, LEFT, RIGHT], d => exits[d] && this.freeRoom(exits[d]));
+        return <RoomPosition>creep.pos.findClosestByPath(dirs[Game.time++ % dirs.length]);
+    }
+
+    private freeRoom(roomName:string):boolean {
+
+        return Game.rooms[roomName] == undefined || Game.rooms[roomName].controller == undefined || Game.rooms[roomName].controller.owner == undefined;
     }
 
     finished(creep:Creep):boolean {
-        return creep.memory.done;
+        return creep.memory.scoutStartRoom !== undefined && creep.room.name != creep.memory.scoutStartRoom;
     }
 
     interactWithTarget(creep:Creep, target:GameObject):any {
-        if (creep.moveTo(target) == OK)
-            creep.memory.done = true;
         return true;
     }
 }

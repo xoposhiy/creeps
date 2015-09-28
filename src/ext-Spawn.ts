@@ -1,7 +1,7 @@
 ///<reference path="screeps-extended.d.ts"/>
 
 var bodyPriority = [WORK, MOVE, CARRY];
-var bodyWarriorPriority = [MOVE, ATTACK];
+var bodyWarriorPriority = [MOVE, ATTACK, RANGED_ATTACK];
 
 var price = {};
 price[WORK]= 100;
@@ -16,7 +16,7 @@ Spawn.prototype.controlSpawn = function (){
     var spawn = this;
     spawn.memory.wantToSpawn = wantToSpawn(spawn);
     if (!spawn.memory.wantToSpawn) return;
-    if (Game.time % 5 == 0)
+    if (Game.time % 10 == 0)
         console.log(Game.time + " SPAWN " + spawn.name + " #creeps " + spawn.room.find(FIND_MY_CREEPS).length + (spawn.memory['wantWarrior'] ? " want Warrior!" : ""));
     var maxEnergy = getTotalEnergyCapacity(this);
     var body = getNextCreepBody(spawn, maxEnergy);
@@ -30,9 +30,10 @@ Spawn.prototype.controlSpawn = function (){
     }
 };
 
-function wantToSpawn(spawn){
+function wantToSpawn(spawn:Spawn){
+    if (spawn.spawning) return false;
     var creepsCount = spawn.room.find(FIND_MY_CREEPS).length;
-    if (creepsCount >= 20) {
+    if (creepsCount >= 15) {
         return false;
     }
     return spawn.memory.nextSpawnTime == undefined ||
@@ -46,24 +47,30 @@ function getTotalEnergyCapacity(spawn){
 }
 
 function getNextCreepBody(spawn:Spawn, maxEnergy:number){
+    var workCount = _.reduce(Game.creeps, (res, c) => res + c.getActiveBodyparts(WORK), 0);
     var bp = bodyPriority;
-    spawn.memory['wantWarrior'] = spawn.memory['wantWarrior'] || spawn.room.find(FIND_MY_CREEPS, {filter: c => c.getActiveBodyparts(ATTACK) > 0}).length == 0;
-    if (spawn.memory['wantWarrior']){
+    spawn.memory.wantWarrior = spawn.memory.wantWarrior || spawn.room.find(FIND_MY_CREEPS, {filter: c => c.getActiveBodyparts(ATTACK) > 0}).length == 0;
+    var wantWarrior = spawn.memory.wantWarrior && workCount > 1;
+    if (wantWarrior){
         bp = bodyWarriorPriority;
     }
-    var workCount = _.reduce(Game.creeps, (res, c) => res + c.getActiveBodyparts(WORK), 0);
     var i = 0;
     var bodyWork = 0;
     var body = [];
     var cost = 0;
+    var healParts = _.reduce(spawn.room.find(FIND_MY_CREEPS), (t:number, c:Creep) => t + c.getActiveBodyparts(HEAL), 0);
+    var wantHealer = wantWarrior || (healParts < 2 && maxEnergy > 1000);
+    var reserve = wantHealer ? 300 : 50;
     while (true){
         var nextPart = bp[i++ % bp.length];
         cost += price[nextPart];
-        if (cost > maxEnergy - 50) return body;
+        if (cost > Math.min(maxEnergy - reserve, 1000500)) break;
         if (nextPart == WORK) bodyWork++;
-        if (bodyWork > workCount+1) return body;
+        if (bodyWork > workCount+1) break;
         body.push(nextPart);
     }
+    if (wantHealer) body.push(HEAL);
+    return body;
 }
 
 function clearDeadCreepsMemory(){

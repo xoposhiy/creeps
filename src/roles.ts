@@ -1,8 +1,12 @@
 ///<reference path="screeps-extended.d.ts"/>
 
 import Profiler = require('profiler');
+import Role = require('Role');
 
-var allRoles = ['builder', 'cargo', 'harvester', 'hungry', 'no', 'reservator', 'returner', 'upgrader', 'scout', 'claimer', 'flag', 'ranger', 'warrior'];
+var allRoles = [
+    'no', 'builder', 'cargo', 'harvester', 'hungry', 'reservator', 'returner', 'upgrader', 'scout',
+    'claimer', 'flag', 'ranger', 'warrior', 'healer'
+];
 
 function loadRole(roleName){
     var roleClass = global['require']('role-' + roleName);
@@ -27,15 +31,20 @@ function getCreepsByRole(role?:string){
 /** @param {Creep} creep
  * @param {Boolean} finished
  */
-function assignNewRole(creep, finished) {
+function assignNewRole(creep:Creep, finished:boolean): Role {
     var oldRole = creep.memory.role;
     creep.memory = {};
     var newRole = getNewRole(creep);
-    //console.log(Game.time + " ROLE " + _.padLeft(oldRole, 12) + " -> " + _.padRight(newRole, 12) +
-    //    " " + creep + " " + creep.pos +
-    //    (finished ? "" : " TIMEOUT"));
+    if (Memory.debug[creep.name])
+    {
+        var message = Game.time + " ROLE " + _.padLeft(oldRole, 12) + " -> " + _.padRight(newRole, 12) +
+            " " + creep + " " + creep.pos +
+            (finished ? "" : " TIMEOUT");
+        console.log(message);
+    }
     creep.say("!" + newRole);
     creep.memory = { role: newRole };
+    return creep.getRole();
 }
 
 /** @param {Creep} creep */
@@ -65,12 +74,14 @@ function getNewRole(creep){
     return (
         tryRole('flag') ||
         tryRole('warrior') ||
+        tryRole('healer') ||
+      //tryRole('ranger') ||
         //no energy:
         tryRole('harvester') ||
         oneOf('hungry', 'scout') ||
         // has energy:
         tryRole('returner') ||
-        tryRole('builder', constructionSites + 1) ||
+        tryRole('builder', constructionSites + 2) ||
         tryRole('upgrader') ||
         tryRole('cargo', 3) || //TODO remove constant. How?!
         tryRole('reservator') ||

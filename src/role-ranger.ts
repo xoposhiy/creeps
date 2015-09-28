@@ -4,10 +4,11 @@ import Role = require('Role');
 
 class Ranger extends Role {
 
-    moveOnTarget = true;
+    actRange = 0;
 
     fits(creep:Creep):boolean {
-        return super.fits(creep);
+        return creep.bodyScore([MOVE, ATTACK]) > 0 &&
+            super.fits(creep);
     }
 
     isTargetActual(creep:Creep, target:Flag):boolean {
@@ -15,14 +16,14 @@ class Ranger extends Role {
     }
 
     getTarget(creep:Creep):GameObject|RoomPosition {
-        var flags = _.filter(Game.flags, (f:Flag) => f.name.substring(0, 3) == "go-" && f.roomName == creep.room.name);
+        var flags = _.filter(Game.flags, (f:Flag) => f.color == COLOR_WHITE && f.roomName == creep.room.name);
         var flag = creep.pos.findClosestByPath(flags);
         return flag;
     }
 
 
     finished(creep:Creep):boolean {
-        return !this.getTarget(creep);
+        return creep.bodyScore([ATTACK]) == 0 || !this.getTarget(creep);
     }
 
     interactWithTarget(creep:Creep, target:GameObject):any {

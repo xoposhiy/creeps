@@ -11,7 +11,7 @@ class Cargo extends Role {
 
     isTargetActual(creep:Creep, target:GameObject):boolean {
         var c = <Creep>target;
-        return c.memory.role == 'upgrader' && c.carry.energy < c.carryCapacity;
+        return c instanceof Creep && c.memory.role == 'upgrader' && c.carry.energy < c.carryCapacity;
     }
 
     waitTimeout():number {

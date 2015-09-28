@@ -6,12 +6,16 @@ class Returner extends Role {
         return (!creep.room.controller || !creep.room.controller.my) && creep.bodyScore([MOVE]) > 0;
     }
 
-    isTargetActual():boolean {
-        return true;
+    isTargetActual(creep:Creep, target:RoomPosition):boolean {
+        return target.roomName == creep.room.name;
     }
 
-    getTarget(creep:Creep):any {
-        return creep.pos.findClosestByPath(FIND_EXIT_BOTTOM); //TODO fix!
+    actRange = 0;
+
+    getTarget(creep:Creep):Flag {
+        var flags = creep.room.find(FIND_FLAGS, {filter: f => f.color == COLOR_GREEN});
+        var flag = <Flag>creep.pos.findClosestByPath(flags);
+        return flag;
     }
 
     finished(creep:Creep):boolean {
@@ -19,7 +23,7 @@ class Returner extends Role {
     }
 
     interactWithTarget(creep:Creep, target:any):any {
-        return creep.moveTo(target);
+        return true;
     }
 }
 

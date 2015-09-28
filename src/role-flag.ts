@@ -12,6 +12,8 @@ class FlagCatcher extends Role {
         return false;
     }
 
+    actRange = 0;
+
     getTarget(creep:Creep):GameObject|RoomPosition {
         var flag = this.flag();
         if (flag && flag.room && flag.room.name == creep.room.name) return flag.pos;

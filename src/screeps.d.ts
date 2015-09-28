@@ -142,7 +142,7 @@ interface Creep {
     getActiveBodyparts(type:string): number;
     harvest(target:Source): number;
     heal(target:Creep): number;
-    move(direction:Direction) : number;
+    move(direction:number) : number;
     moveByPath(path:PathStep[]): number;
     moveTo(x:number, y:number, opts?:MoveToOpts): number;
     moveTo(target:RoomPosition|{pos: RoomPosition}, opts?:MoveToOpts): number;
@@ -264,7 +264,7 @@ interface Game {
     /**
      * A global object representing world GameMap.
      */
-    Map: GameMap;
+    map: GameMap;
     /**
      * A hash containing all the rooms available to you with room names as hash keys.
      */
@@ -413,7 +413,7 @@ interface Room {
      */
     findExitTo(room:string|Room): number;
     /**
-     * Find an optimal path inside the room between fromPos and toPos using A* search algorithm.
+     * Find an optimal path inside the room between fromPos and toPos using A* search S.
      * @param fromPos The start position.
      * @param toPos The end position.
      * @param opts (optional) An object containing additonal pathfinding flags
@@ -490,8 +490,8 @@ interface RoomPosition {
     findClosestByPath<T>(objects:(T|RoomPosition)[], opts?:{filter: any|string; algorithm?: string}): T;
     findClosestByRange<T>(type:number, opts?:{filter: any|string }): T;
     findClosestByRange<T>(objects:(T|RoomPosition)[], opts?:{filter: any|string }): T;
-    findInRange<T>(type:number, range:number, opts?:{filter: any|string; algorithm: string}): T[];
-    findInRange<T>(objects:(T|RoomPosition)[], range:number, opts?:{filter: any|string; algorithm: string}): T[];
+    findInRange<T>(type:number, range:number, opts?:{filter: any|string; algorithm?: string}): T[];
+    findInRange<T>(objects:(T|RoomPosition)[], range:number, opts?:{filter: any|string; algorithm?: string}): T[];
     findPathTo(x:number, y:number, opts?:FindPathOpts): PathStep[];
     findPathTo(target:RoomPosition|{pos: RoomPosition}, opts?:FindPathOpts): PathStep[];
     getDirectionTo(x:number, y:number): number;
@@ -649,6 +649,7 @@ interface Memory {
     flags: {[name: string]: FlagMemory};
     rooms: {[name: string]: RoomMemory};
     spawns: {[name: string]: SpawnMemory};
+    debug: {[name: string]: boolean};
 }
 interface CreepMemory {
 }
@@ -658,16 +659,14 @@ interface RoomMemory {
 }
 interface SpawnMemory {
 }
-declare enum Direction {
-    TOP = 1,
-    TOP_RIGHT = 2,
-    RIGHT = 3,
-    BOTTOM_RIGHT = 4,
-    BOTTOM = 5,
-    BOTTOM_LEFT = 6,
-    LEFT = 7,
-    TOP_LEFT = 8
-}
+declare var TOP;
+declare var TOP_RIGHT;
+declare var RIGHT;
+declare var BOTTOM_RIGHT;
+declare var BOTTOM;
+declare var BOTTOM_LEFT;
+declare var LEFT;
+declare var TOP_LEF;
 declare var FIND_EXIT_TOP;
 declare var FIND_EXIT_RIGHT;
 declare var FIND_EXIT_BOTTOM;
@@ -732,3 +731,14 @@ declare var ERR_GCL_NOT_ENOUGH;
 
 declare type GameObject = ConstructionSite|Creep|Energy|Flag|Source|Spawn|Structure;
 declare var global:any;
+
+declare var COLOR_WHITE;
+declare var COLOR_GREY;
+declare var COLOR_RED;
+declare var COLOR_PURPLE;
+declare var COLOR_BLUE;
+declare var COLOR_CYAN;
+declare var COLOR_GREEN;
+declare var COLOR_YELLOW;
+declare var COLOR_ORANGE;
+declare var COLOR_BROW;

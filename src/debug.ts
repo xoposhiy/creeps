@@ -36,8 +36,11 @@ function pretty(k, v) {
 
 function o(what:string) {
     if (what == '') return _.values(Game.creeps)[0];
-    return Game.getObjectById(what) || Game.creeps[what] || Game.flags[what] || Game.rooms[what]
-        || _.filter(Game.creeps, c => c.memory.role == what);
+    var res = Game.getObjectById(what) || Game.creeps[what] || Game.flags[what] || Game.rooms[what];
+    if (res) return res;
+    var creepsByRole =_.filter(Game.creeps, c => c.memory.role == what);
+    if (creepsByRole.length) return creepsByRole;
+    return _.filter(Game.creeps, c => c.getActiveBodyparts(what) > 0);
 }
 
 function s(what:any) {
