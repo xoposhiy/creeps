@@ -7,7 +7,7 @@ class Role {
     }
 
     waitTimeout():number {
-        return 10;
+        return 3;
     }
 
     isTargetActual(creep:Creep, target:GameObject|RoomPosition):boolean {

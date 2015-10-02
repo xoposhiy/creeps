@@ -1,21 +1,25 @@
 ///<reference path="screeps-extended.d.ts"/>
 
-import Profiler = require('profiler');
+//import Profiler = require('profiler');
 import Role = require('Role');
 
 var allRoles = [
     'no', 'builder', 'cargo', 'harvester', 'hungry', 'reservator', 'returner', 'upgrader', 'scout',
-    'claimer', 'flag', 'ranger', 'warrior', 'healer'
+    'claimer', 'flag', 'ranger', 'warrior', 'healer', 'retreater', 'soldier', "miner"
 ];
 
+var req = function(module){
+    return eval("require('" + module + "')");
+};
+
 function loadRole(roleName){
-    var roleClass = global['require']('role-' + roleName);
+    var roleClass = req('role-' + roleName);
     //Profiler.wrapAll(roleClass);
     return new roleClass();
 }
 var roles = {
     impl: _.zipObject(_.map(allRoles, r => [r, loadRole(r)])),
-    implClass: _.zipObject(_.map(allRoles, r => [r, global['require']('role-' + r)])),
+    implClass: _.zipObject(_.map(allRoles, r => [r, req('role-' + r)])),
     assignNewRole: assignNewRole,
     getCreepsByRole: getCreepsByRole
 };
@@ -73,19 +77,25 @@ function getNewRole(creep){
     var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES).length;
     return (
         tryRole('flag') ||
+        tryRole('retreater') ||
+        //tryRole('soldier') ||
         tryRole('warrior') ||
         tryRole('healer') ||
-      //tryRole('ranger') ||
+        tryRole('ranger') ||
         //no energy:
         tryRole('harvester') ||
-        oneOf('hungry', 'scout') ||
+        tryRole('miner') ||
+        tryRole('hungry') ||
+        tryRole('scout') ||
+        //oneOf('hungry', 'scout') ||
         // has energy:
         tryRole('returner') ||
-        tryRole('builder', constructionSites + 2) ||
+        tryRole('builder', constructionSites + 1) ||
         tryRole('upgrader') ||
-        tryRole('cargo', 3) || //TODO remove constant. How?!
-        tryRole('reservator') ||
+        tryRole('reservator', 2) ||
+        //tryRole('cargo', 3) || //TODO remove constant. How?!
         tryRole('builder') ||
+        tryRole('reservator') ||
         'no'
     );
 }

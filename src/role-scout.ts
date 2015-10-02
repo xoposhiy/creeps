@@ -7,7 +7,7 @@ class Scout extends Role {
     actRange = 0;
 
     fits(creep:Creep):boolean {
-        return creep.carry.energy == 0 && creep.ticksToLive > 200 &&
+        return creep.carry.energy == 0 && creep.ticksToLive > 100 &&
             creep.bodyScore([WORK, CARRY, MOVE, MOVE]) &&
             super.fits(creep);
     }
@@ -29,7 +29,8 @@ class Scout extends Role {
     }
 
     finished(creep:Creep):boolean {
-        return creep.memory.scoutStartRoom !== undefined && creep.room.name != creep.memory.scoutStartRoom;
+        var leaveRoom = creep.memory.scoutStartRoom !== undefined && creep.room.name != creep.memory.scoutStartRoom;
+        return leaveRoom || creep.room.controller == undefined;
     }
 
     interactWithTarget(creep:Creep, target:GameObject):any {

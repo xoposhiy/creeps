@@ -15,7 +15,7 @@ roomPos.countEmptyTilesAround = function() {
     return spaces;
 };
 
-roomPos.getAssignedCreeps = function () {
+roomPos.getAssignedCreeps = function (): string[] {
     var pos = this;
     Memory.assignedCreeps = Memory.assignedCreeps || {};
     var creeps = Memory.assignedCreeps[pos] || [];

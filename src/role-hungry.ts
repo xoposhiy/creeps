@@ -5,7 +5,6 @@ class Hungry extends Role {
     fits(creep:Creep):boolean {
         return creep.carry.energy == 0 &&
             creep.bodyScore([MOVE, CARRY]) > 0 &&
-            !creep.room.isSpawningTime() &&
             super.fits(creep);
     }
 
@@ -14,15 +13,16 @@ class Hungry extends Role {
     }
 
     isTargetActual(creep:Creep, target:GameObject):boolean {
-        return canObjectBeTarget(target);
+        return target['energy'] > 20 || target['carry'] && target['carry']['energy'] > 20;
     }
 
     getTarget(creep:Creep):GameObject {
-        return creep.pos.findClosestByPath(findEnergySources(creep));
+        return <Energy>creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {filter: (e:Energy) => e.energy > 20}) ||
+            <Creep>creep.pos.findClosestByPath(FIND_MY_CREEPS, {filter: canCreepBeTarget});
     }
 
     finished(creep:Creep):boolean {
-        return creep.carry.energy == creep.carryCapacity || creep.room.isSpawningTime();
+        return creep.carry.energy == creep.carryCapacity;
     }
 
     interactWithTarget(creep:Creep, target:GameObject):any {
@@ -30,22 +30,9 @@ class Hungry extends Role {
     }
 }
 
-function findEnergySources(creep: Creep): GameObject[]{
-    var mates = creep.room.find(FIND_MY_CREEPS,
-        {filter: canCreepBeTarget});
-    var storages = creep.room.find(FIND_MY_STRUCTURES, {filter: canObjectBeTarget});
-    var droppedEnergy = creep.room.find(FIND_DROPPED_ENERGY);
-    return mates.concat(storages).concat(droppedEnergy);
-}
-
 function canCreepBeTarget(creep: Creep){
-    return ['harvester', 'reservator', 'no', 'cargo', 'scout'].indexOf(creep.memory.role) >= 0 && creep.carry.energy > 30;
+    return ['harvester', 'miner', 'no', 'cargo', 'scout'].indexOf(creep.memory.role) >= 0 && creep.carry.energy > 50;
 }
 
-function canObjectBeTarget(obj: GameObject){
-    if (obj['carry'])
-        return canCreepBeTarget(<Creep>obj);
-    return (obj['store'] ? obj['store']['energy'] : obj['energy']) > 20;
-}
 
 export = Hungry;

@@ -3,7 +3,9 @@ import Role = require('Role');
 class Returner extends Role {
 
     fits(creep:Creep):boolean {
-        return (!creep.room.controller || !creep.room.controller.my) && creep.bodyScore([MOVE]) > 0;
+        return (!creep.room.controller || !creep.room.controller.my) &&
+            creep.bodyScore([MOVE]) > 0 &&
+            super.fits(creep);
     }
 
     isTargetActual(creep:Creep, target:RoomPosition):boolean {
@@ -13,13 +15,14 @@ class Returner extends Role {
     actRange = 0;
 
     getTarget(creep:Creep):Flag {
+        creep.memory.scoutStartRoom = creep.room.name;
         var flags = creep.room.find(FIND_FLAGS, {filter: f => f.color == COLOR_GREEN});
-        var flag = <Flag>creep.pos.findClosestByPath(flags);
-        return flag;
+        return <Flag>creep.pos.findClosestByPath(flags);
     }
 
     finished(creep:Creep):boolean {
-        return creep.room.controller && creep.room.controller.my;
+        var leaveRoom = creep.memory.scoutStartRoom !== undefined && creep.room.name != creep.memory.scoutStartRoom;
+        return leaveRoom || creep.room.controller && creep.room.controller.my;
     }
 
     interactWithTarget(creep:Creep, target:any):any {

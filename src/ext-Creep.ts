@@ -69,10 +69,16 @@ Creep.prototype.control = function control()
 {
     var creep = this;
     if (creep.spawning) return;
+    if (creep.hits < creep.hitsMax) creep.heal(creep);
     var role = creep.getRole();
     if (role.finished(creep))
         role = creep.assignNewRole(true);
-    if (role.finished(creep)) return; // new role is bad :(
+    if (role.finished(creep)) {
+        Memory.statsNo++;
+        return;
+    } // new role is bad :(
+    if (creep.memory.role == 'no')
+        Memory.statsNo++;
     if (role.run(creep)) {
         creep.memory.startWaitTime = undefined;
     }

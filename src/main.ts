@@ -1,6 +1,6 @@
 ///<reference path="screeps-extended.d.ts"/>
 
-import Profiler = require('profiler');
+//import Profiler = require('profiler');
 import ext = require("ext"); ext.extend();
 import roles = require('roles');
 import debug = require('debug'); debug.populate(global);
@@ -8,7 +8,9 @@ import statistics = require('statistics');
 
 global.stats = statistics.stats;
 
-Profiler.start();
+//Profiler.start();
+
+if (!Memory.debug) Memory.debug = {};
 
 export var loop = main;
 

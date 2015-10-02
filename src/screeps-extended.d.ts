@@ -14,6 +14,7 @@ interface Creep {
 }
 interface Room {
     isSpawningTime(): boolean;
+    isPassable(pos: RoomPosition): boolean;
 }
 interface RoomPosition {
     canAssign(creep:Creep): boolean;

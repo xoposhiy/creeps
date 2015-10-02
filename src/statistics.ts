@@ -4,12 +4,14 @@ class StatItem
 {
     constructor(time, control, act, hang, no){
         this.time = time;
+        this.realTime = new Date().toTimeString();
         this.control = control;
         this.act = act;
         this.hang = hang;
         this.no = no;
     }
 
+    realTime;
     time;
     control;
     controlDelta;
@@ -17,8 +19,12 @@ class StatItem
     hang;
     no;
 
-    static format(item:StatItem):string {
-        return [item.time, item.control, item.controlDelta, item.act, item.hang, item.no].join(' ');
+    static format(item:StatItem, delimiter:string = ' '):string {
+        return [item.realTime, item.time, item.controlDelta, item.act, item.hang, item.no].join(delimiter);
+    }
+
+    static header(delimiter:string = ' '): string {
+        return ["time", "ticks", "control", "act", "hang", "no"].join(delimiter);
     }
 }
 
@@ -42,13 +48,13 @@ class Stats{
             var last = Memory.stats[Memory.stats.length-1] || statItem;
             statItem.controlDelta = control - last.control;
             Memory.stats.push(statItem);
-            console.log("stat: " + StatItem.format(statItem));
+            console.log(StatItem.header() + '\n' + StatItem.format(statItem));
         }
     }
 
-    report(){
-        var report = _.map(Memory.stats, StatItem.format).join('\n');
-        return report;
+    report(delimiter:string = ' '){
+        var report = _.map(Memory.stats, (s:StatItem) => StatItem.format(s, '\t')).join('\n');
+        return StatItem.header(delimiter) + '\n' + report;
     }
 }
 
