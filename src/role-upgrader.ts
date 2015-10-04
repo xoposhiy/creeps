@@ -28,7 +28,7 @@ class Upgrader extends Role {
 
     interactWithTarget(creep:Creep, target:Structure):any {
         var upper = Upper.forRoom(creep.room);
-        if (upper && upper.pos.isNearTo(creep.pos) && target.pos.getAssignedCreeps().length == target.pos.countEmptyTilesAround()){
+        if (upper && upper.pos.isNearTo(creep.pos) && !upper.pos.isNearTo(target) && target.pos.getAssignedCreeps().length == target.pos.countEmptyTilesAround()){
             creep.assignNewRole(true);
         }
         creep.pickEnergy(['harvester', 'miner', 'reservator', 'builder']);
