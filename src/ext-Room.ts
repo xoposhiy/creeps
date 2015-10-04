@@ -9,6 +9,12 @@ Room.prototype.isPassable = function(pos:RoomPosition){
     return isPassableTile(this.lookAt(pos));
 };
 
+Room.prototype.forbidden = function (){
+    return this.find(FIND_FLAGS, {filter: f => _.startsWith(f.name, "forbidden")}).length > 0;
+};
+
+
+
 function isPassableTile(list){
     for (var i = 0; i < list.length; i++) {
         if (list[i].type === "terrain" && (

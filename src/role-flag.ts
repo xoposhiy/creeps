@@ -15,22 +15,21 @@ class FlagCatcher extends Role {
     actRange = 0;
 
     getTarget(creep:Creep):GameObject|RoomPosition {
-        var flag = this.flag();
+        var flag = this.flag(creep);
         if (flag && flag.room && flag.room.name == creep.room.name) return flag.pos;
         return undefined;
     }
-    private flag(){
-        return Game.flags['CTF'];
+    private flag(creep:Creep):Flag{
+        return Game.flags['CTF'] || Game.flags[creep.name];
     }
 
-    finished():boolean {
-        var flag = this.flag();
-        return !flag;
+    finished(creep:Creep):boolean {
+        return !this.flag(creep);
     }
 
     interactWithTarget(creep:Creep, target:GameObject):any {
-        console.log('flag-creep came to ' + target);
-        return this.flag() && (this.flag().remove() == OK);
+        var flag = this.flag(creep);
+        return flag && (flag.color == COLOR_BLUE || flag.remove() == OK);
     }
 }
 

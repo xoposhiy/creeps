@@ -10,7 +10,7 @@ class Warrior extends Role {
      */
 
     fits(creep:Creep):boolean {
-        return creep.bodyScore([ATTACK, MOVE]) > 0 &&
+        return creep.bodyScore([RANGED_ATTACK, MOVE]) > 0 &&
             super.fits(creep);
     }
 
@@ -20,7 +20,7 @@ class Warrior extends Role {
 
     actRange = 3;
 
-    moveCLoser = true;
+    moveCloser = false;
 
     getTarget(creep:Creep):GameObject {
         if (creep.bodyScore([RANGED_ATTACK]) > 0) {

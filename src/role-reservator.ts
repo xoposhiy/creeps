@@ -11,7 +11,7 @@ class Reservator extends Role {
     }
 
     isTargetActual(creep:Creep, target:Creep|Spawn|Structure):boolean {
-        return !isFull(target) && target.my;
+        return target.my && !isFull(target);
     }
 
     finished(creep:Creep):boolean {
@@ -23,10 +23,14 @@ class Reservator extends Role {
     }
 
     getTarget(creep:Creep):GameObject {
-        var spawnOrExtension = <GameObject>creep.pos.findClosestByPath(FIND_STRUCTURES,
-            {filter: s => (s.structureType == STRUCTURE_EXTENSION || s.structureType == 'spawn') &&
+        var spawnOrExtension = <Spawn|Extension>creep.pos.findClosestByPath(FIND_STRUCTURES,
+            {filter: s => _.includes(["extension", "spawn"], s.structureType) &&
             this.isTargetActual(creep, s)
             });
+        if (spawnOrExtension && !_.includes(["extension", "spawn"], spawnOrExtension.structureType)){
+            var message = "spawnOrExtension is " + global.s(spawnOrExtension);
+            Game.notify(message, 1);
+        }
         if (spawnOrExtension) return spawnOrExtension; //better than storage!
         var storage = <GameObject>creep.pos.findClosestByPath(FIND_STRUCTURES,
             {filter: s => s.structureType == STRUCTURE_STORAGE
@@ -41,8 +45,10 @@ function isFull(s){
         return s.energy == s.energyCapacity;
     else if (s.store !== undefined)
         return s.store.energy == s.storeCapacity;
-    else
-        throw Error("unknown storage " + s);
+    else {
+        console.log("unknown storage " + s + " " + new Error()['stack']);
+        return true;
+    }
 }
 
 export = Reservator;

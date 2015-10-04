@@ -11,7 +11,7 @@ class Cargo extends Role {
 
     isTargetActual(creep:Creep, target:GameObject):boolean {
         var c = <Creep>target;
-        return c instanceof Creep && c.memory.role == 'upgrader' && c.carry.energy < c.carryCapacity;
+        return c instanceof Creep && c.memory.role == 'upgrader';
     }
 
     waitTimeout():number {
@@ -21,7 +21,7 @@ class Cargo extends Role {
     getTarget(creep:Creep):any {
         return creep.pos.findClosestByPath(FIND_MY_CREEPS, {
             filter: c =>
-            c.memory.role == 'upgrader' && c.carry.energy < c.carryCapacity - 5 && c.pos.canAssign(creep)
+            c.memory.role == 'upgrader' && c.pos.canAssign(creep)
         });
     }
 

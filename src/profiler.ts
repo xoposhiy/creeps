@@ -58,25 +58,24 @@ class Profiler{
 
     static reset(){
         Memory.usedCpu = {};
+        Memory.startProfilingTime = Game.time;
     }
 
     static report(){
+        var totalTicks = Game.time - Memory.startProfilingTime;
         for (var n in Memory.usedCpu) {
             var p = Memory.usedCpu[n];
-            if (p.count === 0) {
-                p.average = 0;
-                continue;
-            }
-            p.average = p.usage / p.count;
+            p.usagePerCall = p.count === 0 ? 0 : p.usage / p.count;
         }
         var lines = [];
         for (n in Memory.usedCpu) {
             p = Memory.usedCpu[n];
             if (p.usage == 0) continue;
-            lines.push({name: _.padLeft(n, 30), usage: Math.round(p.usage), count: p.count, average: Math.round(p.average)});
+            lines.push({name: _.padLeft(n, 30), usagePerTick: (p.usage/totalTicks).toFixed(2), countPerTick: (p.count / totalTicks).toFixed(3), usagePerCall: p.usagePerCall.toFixed(2)});
         }
-        lines = _.sortBy(lines, 'usage').reverse();
-        return _.padLeft("name", 30) + " usage count average\n" +
+        lines = _.sortBy(lines, 'usagePerTick').reverse();
+        return "totalTicks: " + totalTicks + "\n" +
+            _.padLeft("name", 30) + " usagePerTick countPerTick usagePerCall\n" +
             _.map(lines.slice(0, 20), line => _.values(line).join(' ')).join('\n');
     }
 }

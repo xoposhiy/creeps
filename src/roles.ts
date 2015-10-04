@@ -5,7 +5,7 @@ import Role = require('Role');
 
 var allRoles = [
     'no', 'builder', 'cargo', 'harvester', 'hungry', 'reservator', 'returner', 'upgrader', 'scout',
-    'claimer', 'flag', 'ranger', 'warrior', 'healer', 'retreater', 'soldier', "miner"
+    'claimer', 'flag', 'ranger', 'warrior', 'healer', 'retreater', 'soldier', "miner", 'defender', 'upper'
 ];
 
 var req = function(module){
@@ -77,23 +77,25 @@ function getNewRole(creep){
     var constructionSites = creep.room.find(FIND_CONSTRUCTION_SITES).length;
     return (
         tryRole('flag') ||
-        tryRole('retreater') ||
-        //tryRole('soldier') ||
-        tryRole('warrior') ||
+        //tryRole('retreater') ||
+        //tryRole('warrior') ||
+        tryRole('defender') ||
         tryRole('healer') ||
+        tryRole('soldier') ||
         tryRole('ranger') ||
         //no energy:
-        tryRole('harvester') ||
         tryRole('miner') ||
+        tryRole('upper') ||
+        tryRole('harvester') ||
         tryRole('hungry') ||
         tryRole('scout') ||
-        //oneOf('hungry', 'scout') ||
         // has energy:
         tryRole('returner') ||
+        tryRole('reservator', creep.room.isSpawningTime() ? 3: 1) ||
         tryRole('builder', constructionSites + 1) ||
         tryRole('upgrader') ||
         tryRole('reservator', 2) ||
-        //tryRole('cargo', 3) || //TODO remove constant. How?!
+        tryRole('cargo', 1) ||
         tryRole('builder') ||
         tryRole('reservator') ||
         'no'

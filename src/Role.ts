@@ -57,7 +57,8 @@ class Role {
                 creep.memory.targetPosition = <RoomPosition>target;
         }
         return res;
-    }
+
+}
 }
 
 export = Role;

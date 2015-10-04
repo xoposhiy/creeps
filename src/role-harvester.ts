@@ -1,11 +1,11 @@
 import Role = require('Role');
+import Miner = require('role-miner');
 
 class Harvester extends Role {
 
     fits(creep: Creep): boolean {
         return creep.carry.energy < 10 &&
             creep.bodyScore([WORK, WORK, CARRY, MOVE]) > 0 &&
-            (!creep.room.controller || !creep.room.controller.my)
             super.fits(creep);
     }
 
@@ -14,12 +14,15 @@ class Harvester extends Role {
     }
 
     getTarget(creep:Creep): Source|Energy {
-        var energy = <Energy>creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
-            filter: (e:Energy) => this.needHelpToHarvest(creep, e) && e.pos.canAssign(creep)
-        });
-        if (energy) return energy;
+        if (creep.room.forbidden()) return undefined;
+        if (!creep.room.controller || !creep.room.controller.my) {
+            var energy = <Energy>creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
+                filter: (e:Energy) => this.needHelpToHarvest(creep, e) && e.pos.canAssign(creep)
+            });
+            if (energy) return energy;
+        }
         var source = <Source>creep.pos.findClosestByPath(FIND_SOURCES, {
-            filter: (s:Source) => this.isTargetActual(creep, s) && s.pos.canAssign(creep)
+            filter: (s:Source) => this.isTargetActual(creep, s) && s.pos.canAssign(creep) && Miner.posIsFree(s.pos)
         });
         return source;
     }

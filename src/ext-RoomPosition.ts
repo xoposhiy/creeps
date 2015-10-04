@@ -1,8 +1,6 @@
 ///<reference path="screeps-extended.d.ts"/>
 
-var roomPos = RoomPosition.prototype;
-
-roomPos.countEmptyTilesAround = function() {
+RoomPosition.prototype.countEmptyTilesAround = function() {
     var xMin = Math.max(0, this.x - 1);
     var xMax = Math.min(49, this.x + 1);
     var yMin = Math.max(0, this.y - 1);
@@ -15,7 +13,7 @@ roomPos.countEmptyTilesAround = function() {
     return spaces;
 };
 
-roomPos.getAssignedCreeps = function (): string[] {
+RoomPosition.prototype.getAssignedCreeps = function (): string[] {
     var pos = this;
     Memory.assignedCreeps = Memory.assignedCreeps || {};
     var creeps = Memory.assignedCreeps[pos] || [];
@@ -23,19 +21,36 @@ roomPos.getAssignedCreeps = function (): string[] {
     return Memory.assignedCreeps[pos];
 };
 
-roomPos.canAssign = function (creep:Creep) {
+RoomPosition.prototype.canAssign = function (creep:Creep) {
     var pos = this;
     var creeps = pos.getAssignedCreeps();
     return creeps.indexOf(creep.id) >= 0 || creeps.length < pos.countEmptyTilesAround();
 };
 
-/** @param {Creep} creep */
-roomPos.assign = function (creep:Creep) {
+RoomPosition.prototype.getArea = function<T>(type:string, radius:number, filter?: (obj:T)=>boolean): T[]{
+    var pos = this;
+    var matrix = Game.rooms[pos.roomName]
+        .lookForAtArea(
+            type,
+            Math.max(0, pos.y-radius), Math.max(0, pos.x-radius),
+            Math.min(49, pos.y+radius), Math.min(49, pos.x+radius));
+    var res = _.chain(matrix).values().map(d => _.values(d)).flatten().flatten();
+    if (filter)
+        res = res.filter(filter);
+    return res.value();
+};
+
+RoomPosition.prototype.assign = function (creep:Creep, force?:boolean) {
     var pos = this;
     var creeps = pos.getAssignedCreeps();
     if (creeps.indexOf(creep.id) < 0) {
-        if (creeps.length >= pos.countEmptyTilesAround()) return false;
-        creeps.push(creep.id);
+        var hasRoom = creeps.length < pos.countEmptyTilesAround();
+        if (hasRoom || force) {
+            if (!hasRoom) creeps[0] = creep.id;
+            else creeps.push(creep.id);
+        }
+        else
+            return false;
     }
     creep.memory.targetPos = pos.toString();
     return true;

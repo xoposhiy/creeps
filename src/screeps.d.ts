@@ -503,7 +503,7 @@ interface RoomPosition {
     isEqualTo(target:RoomPosition|{pos: RoomPosition}): boolean;
     isNearTo(x:number, y:number): boolean;
     isNearTo(target:RoomPosition|{pos: RoomPosition}): boolean;
-    look(): LookAtResult;
+    look(): LookAtResult[];
     lookFor<T>(type:string): T[];
 }
 declare var Source:any;

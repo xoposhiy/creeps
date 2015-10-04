@@ -8,20 +8,25 @@ class Ranger extends Role {
 
     fits(creep:Creep):boolean {
         return this.flag() && Game.flags['go'] && Game.flags['go'].roomName == creep.room.name &&
-            creep.bodyScore([MOVE, ATTACK]) > 0 &&
+            creep.bodyScore([MOVE, RANGED_ATTACK]) > 0 &&
             super.fits(creep);
     }
 
-    isTargetActual(creep:Creep, target:Flag):boolean {
-        return target.roomName == creep.room.name;
+    isTargetActual(creep:Creep, target:RoomPosition):boolean {
+        return target.roomName == creep.room.name && Game.time % 11 != 2;
     }
 
-    getTarget(creep:Creep):GameObject|RoomPosition {
+    getTarget(creep:Creep):RoomPosition {
         var flag = this.flag();
         if (!flag) return undefined;
-        var dir = Game.map.findExit(creep.room.name, flag.roomName);
-        if (dir < 0) return undefined;
-        return creep.pos.findClosestByPath(dir);
+        if (flag.roomName != creep.room.name){
+            var dir = Game.map.findExit(creep.room.name, flag.roomName);
+            if (dir < 0) return undefined;
+            return <RoomPosition>creep.pos.findClosestByPath(dir);
+        }
+        else{
+            return flag.pos;
+        }
     }
 
     flag() : Flag{
@@ -30,7 +35,7 @@ class Ranger extends Role {
 
 
     finished(creep:Creep):boolean {
-        return creep.bodyScore([ATTACK]) == 0 || !this.flag() || this.flag().roomName == creep.room.name;
+        return !this.flag() || this.flag().pos.inRangeTo(creep.pos, 2);
     }
 
     interactWithTarget(creep:Creep, target:GameObject):any {

@@ -13,11 +13,16 @@ class Scout extends Role {
     }
 
     isTargetActual(creep:Creep, target:GameObject):boolean {
-        return true;
+        return Game.time%51!=0;
     }
 
     getTarget(creep:Creep):RoomPosition {
         creep.memory.scoutStartRoom = creep.room.name;
+        var fs = <Flag[]>creep.room.find(FIND_FLAGS, {filter: (f:Flag) => f.color == COLOR_ORANGE});
+        if (fs.length) {
+            var f = fs[Game.time % fs.length];
+            if (f) return f.pos;
+        }
         var exits = Game.map.describeExits(creep.room.name);
         var dirs = _.filter([TOP, BOTTOM, LEFT, RIGHT], d => exits[d] && this.freeRoom(exits[d]));
         return <RoomPosition>creep.pos.findClosestByPath(dirs[Game.time++ % dirs.length]);

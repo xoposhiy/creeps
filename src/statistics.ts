@@ -52,9 +52,9 @@ class Stats{
         }
     }
 
-    report(delimiter:string = ' '){
+    report(){
         var report = _.map(Memory.stats, (s:StatItem) => StatItem.format(s, '\t')).join('\n');
-        return StatItem.header(delimiter) + '\n' + report;
+        return StatItem.header('\t') + '\n' + report;
     }
 }
 

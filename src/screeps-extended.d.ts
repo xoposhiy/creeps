@@ -1,26 +1,31 @@
 ///<reference path="screeps.d.ts"/>
 
-declare module "jsRoleLoader" {}
+declare module "jsRoleLoader" {
+}
 
 interface Creep {
     approachAndDo(target:GameObject|RoomPosition, interact:any, actRange:number, moveCloser:boolean):boolean;
-    log(message:string):void;
     getRole():any;
     control():void;
     bodyScore(body:Array<string>): number;
     assignNewRole(finished:boolean): any;
     getCreepsByRole(): Object;
     takeEnergyFrom(target:GameObject):number;
+    log(message:string):void;
+    isDebug():boolean;
+    pickEnergy(roles?:string[]):boolean;
 }
 interface Room {
     isSpawningTime(): boolean;
-    isPassable(pos: RoomPosition): boolean;
+    isPassable(pos:RoomPosition): boolean;
+    forbidden():boolean;
 }
 interface RoomPosition {
     canAssign(creep:Creep): boolean;
     countEmptyTilesAround(): number;
     getAssignedCreeps(): string[];
-    assign(creep:Creep): boolean;
+    assign(creep:Creep, force?:boolean): boolean;
+    getArea<T>(type:string, radius:number, filter?: (obj:T)=>boolean): T[];
 }
 interface Spawn {
     controlSpawn(): void;
@@ -33,10 +38,13 @@ interface Structure {
 interface Memory {
     assignedCreeps: {[pos: string]: Array<string>};
     usedCpu: Object;
+    startProfilingTime:number;
     stats: any;
     statsAct: number;
     statsHang: number;
     statsNo: number;
+    hungryQueues: {[pos:string]: Array<{creepId:string; arrivalTime: number; energyNeed:number}>}
+
 }
 interface CreepMemory {
     role?: string;

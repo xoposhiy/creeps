@@ -64,9 +64,21 @@ function r(what:any, roleName:string){
     });
 }
 
+function d(id){
+    Memory.debug = {};
+    if (id)
+        Memory.debug[id] = true;
+}
+
 export function populate(g){
     g.o = o;
     g.s = s;
     g.m = m;
     g.r = r;
+    g.rangers = function(){
+        r(RANGED_ATTACK, 'ranger');
+        r(ATTACK, 'ranger');
+        r(HEAL, 'ranger');
+    };
+    g.d = d;
 }
