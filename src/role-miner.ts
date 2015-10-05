@@ -3,8 +3,10 @@ import Role = require('Role');
 
 class Miner extends Role {
 
-    static getBody() {
-        return [MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, WORK, WORK, WORK, WORK, WORK, WORK];
+    static getBody(maxEnergy:number) {
+        var workSegment = Creep.makeBody(100500, [WORK], 6, [MOVE, CARRY]);
+        var carryEnergy = Math.max(0, maxEnergy - Creep.bodyCost(workSegment));
+        return workSegment.concat(Creep.makeBody(carryEnergy, [CARRY], 6));
     }
 
     fits(creep:Creep):boolean {
@@ -28,6 +30,11 @@ class Miner extends Role {
             creep.harvest(Miner.getSource(target));
         }
         else {
+            if (target.pos.getRangeTo(creep.pos) <= 3)
+                target.pos.getAssignedCreeps().forEach(id => {
+                    if (id != creep.id)
+                        (<Creep>Game.getObjectById(id)).assignNewRole(true);
+                });
             creep.moveTo(target);
         }
         return true;
@@ -118,7 +125,7 @@ class Miner extends Role {
     }
 
     static wantMiner(spawn:Spawn, maxEnergy:number):boolean {
-        if (maxEnergy < Creep.bodyCost(Miner.getBody())) {
+        if (maxEnergy < Creep.bodyCost(Miner.getBody(maxEnergy))) {
             return false;
         }
         var freeMines = Miner.getFreeMineFlags(spawn.room).length;
