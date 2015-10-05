@@ -11,19 +11,17 @@ Spawn.prototype.controlSpawn = function (){
     var creepsCount = spawn.room.find(FIND_MY_CREEPS).length;
     var maxEnergy = getTotalEnergyCapacity(this);
     var body = getNextCreepBody(spawn, maxEnergy);
-    if (Game.time % 10 == 0)
-        console.log(Game.time + " SPAWN " + spawn.name +
-            " want " + spawn.memory['want'] + " size " + body.length +
-            " #creeps " +creepsCount +
-            " #WORK " + spawn.memory['workCount'] +
-            " maxE " + maxEnergy);
     var canCreate = this.canCreateCreep(body);
     if (canCreate == OK){
-        console.log(Game.time + " SPAWN " + spawn.name + " creating: " + body);
         spawn.memory.nextSpawnTime = Game.time + 60;
         clearDeadCreepsMemory();
         var isUpper = spawn.memory['want'] == "upper";
         var name = isUpper ? spawn.room.name : spawn.memory['want'][0] + body.length +'_' + Game.time % 1000;
+        console.log(Game.time + " SPAWN " + spawn.name +
+            " creating " + name + " size " + body.length +
+            " #creeps " +creepsCount +
+            " #WORK " + spawn.memory['workCount'] +
+            " maxE " + maxEnergy);
         spawn.createCreep(body, name, {role: isUpper ? 'upper' : 'no'});
     }
 };
@@ -31,7 +29,7 @@ Spawn.prototype.controlSpawn = function (){
 function wantToSpawn(spawn:Spawn){
     if (spawn.spawning) return false;
     var creepsCount = spawn.room.find(FIND_MY_CREEPS).length;
-    if (creepsCount >= 15) return false;
+    if (creepsCount >= 20) return false;
     return creepsCount < 10 || spawn.room.energyAvailable >= spawn.room.energyCapacityAvailable;
 }
 
@@ -54,7 +52,7 @@ function getNextCreepBody(spawn:Spawn, maxEnergy:number){
     }
     if (Miner.wantMiner(spawn, maxEnergy) && workCount > 2){
         spawn.memory['want'] = "miner";
-        return Miner.getBody();
+        return Miner.getBody(maxEnergy);
     }
     if (Upper.wantUpper(maxEnergy, spawn.room)){
         spawn.memory['want'] = "upper";
