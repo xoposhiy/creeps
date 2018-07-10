@@ -1,6 +1,8 @@
 ///<reference path="screeps.d.ts"/>
-
-declare module "jsRoleLoader" {
+declare module _ {
+    interface LoDashStatic {
+        minValue<T>(arr:T[],getCost:(T)=>number):T;
+    }
 }
 
 interface Creep {
@@ -14,28 +16,38 @@ interface Creep {
     log(message:string):void;
     isDebug():boolean;
     pickEnergy(roles?:string[]):boolean;
+    isWarrior():boolean;
+    longMemory(): CreepLongMemory;
 }
 interface Room {
     isSpawningTime(): boolean;
+    isMy(): boolean;
     isPassable(pos:RoomPosition): boolean;
     forbidden():boolean;
 }
 interface RoomPosition {
-    canAssign(creep:Creep): boolean;
+    canAssign(creep?:Creep): boolean;
     countEmptyTilesAround(): number;
     getAssignedCreeps(): string[];
     assign(creep:Creep, force?:boolean): boolean;
     getArea<T>(type:string, radius:number, filter?: (obj:T)=>boolean): T[];
+    estimateDistanceTo(to:RoomPosition):number;
+    isOnBorder ():boolean;
 }
+
 interface Spawn {
     controlSpawn(): void;
-    getStoredEnergy(): number;
+    schedule(type:string):string;
 }
 interface Structure {
-    getStoredEnergy(): number;
-    getEnergyCapacity(): number;
 }
+
+interface CreepLongMemory {
+    roomName?: string;
+}
+
 interface Memory {
+    creepLongMemory : {[id:string]: CreepLongMemory};
     assignedCreeps: {[pos: string]: Array<string>};
     usedCpu: Object;
     startProfilingTime:number;
@@ -58,6 +70,7 @@ interface CreepMemory {
 }
 
 interface SpawnMemory {
+    queue: string[];
     wantToSpawn: boolean;
     nextSpawnTime: number;
     wantWarrior: boolean;

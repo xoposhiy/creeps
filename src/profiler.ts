@@ -73,10 +73,10 @@ class Profiler{
             if (p.usage == 0) continue;
             lines.push({name: _.padLeft(n, 30), usagePerTick: (p.usage/totalTicks).toFixed(2), countPerTick: (p.count / totalTicks).toFixed(3), usagePerCall: p.usagePerCall.toFixed(2)});
         }
-        lines = _.sortBy(lines, 'usagePerTick').reverse();
+        lines = _.sortBy(lines, l => -l.usagePerTick);
         return "totalTicks: " + totalTicks + "\n" +
             _.padLeft("name", 30) + " usagePerTick countPerTick usagePerCall\n" +
-            _.map(lines.slice(0, 20), line => _.values(line).join(' ')).join('\n');
+            _.map(lines.slice(0, 50), line => _.values(line).join(' ')).join('\n');
     }
 }
 export = Profiler;

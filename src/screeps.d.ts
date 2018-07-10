@@ -148,14 +148,13 @@ interface Creep {
     moveTo(target:RoomPosition|{pos: RoomPosition}, opts?:MoveToOpts): number;
     notifyWhenAttacked(enabled:boolean): number;
     pickup(target:Energy): number;
-    rangedAttack(target:Creep|Spawn|Structure): number;
+    rangedAttack(target:Creep|Spawn|Structure|ConstructionSite): number;
     rangedHeal(target:Creep): number;
     rangedMassAttack(): number;
     repair(target:Spawn|Structure): number;
     say(message:string): number;
     suicide(): number;
     transferEnergy(target:Creep|Spawn|Structure, amount?:number): number;
-    takeEnergyFrom(target:GameObject): number;
     unclaimController(target:Structure): number;
     upgradeController(target:Structure): number;
 }
@@ -210,10 +209,6 @@ interface Flag {
      * The link to the Room object. May not be available in case a flag is placed in a room which you do not have access to.
      */
     room: Room;
-    /**
-     * The name of the room in which this flag is in. This property is deprecated and will be removed soon. Use pos.roomName instead.
-     */
-    roomName: string;
     /**
      * Remove the flag.
      * @returns Result Code: OK
@@ -299,6 +294,7 @@ interface Game {
      */
     notify(message:string, groupInterval:number): void;
 }
+declare var GameMap;
 /**
  * A global object representing world GameMap. Use it to navigate between rooms. The object is accessible via Game.GameMap property.
  */
@@ -325,7 +321,7 @@ interface GameMap {
      * @param toRoom Finish room name or room object.
      * @returns the route array or ERR_NO_PATH code
      */
-    findRoute(fromRoom:string|Room, toRoom:string|Room): [{exit: string; room: string}]|number;
+    findRoute(fromRoom:string|Room, toRoom:string|Room): [{exit: number; room: string}]|number;
     /**
      * Check if the room with the given name is protected by temporary "newbie" walls.
      * @param roomName The room name.
@@ -365,7 +361,7 @@ interface Room {
     /**
      * The Storage structure of this room, if present, otherwise undefined.
      */
-    storage: Structure;
+    storage: Storage;
     /**
      * An object with survival game info if available
      */
@@ -486,7 +482,7 @@ interface RoomPosition {
     y: number;
     createConstructionSite(structureType:string): number;
     createFlag(name:string, color:string): number;
-    findClosestByPath<T>(type:number, opts?:{filter: any|string; algorithm?: string}): GameObject|RoomPosition;
+    findClosestByPath<T>(type:number, opts?:{filter: (o:T)=>boolean|string; algorithm?: string}): GameObject|RoomPosition;
     findClosestByPath<T>(objects:(T|RoomPosition)[], opts?:{filter: any|string; algorithm?: string}): T;
     findClosestByRange<T>(type:number, opts?:{filter: any|string }): T;
     findClosestByRange<T>(objects:(T|RoomPosition)[], opts?:{filter: any|string }): T;

@@ -9,6 +9,10 @@ Room.prototype.isPassable = function(pos:RoomPosition){
     return isPassableTile(this.lookAt(pos));
 };
 
+Room.prototype.isMy = function(){
+    return !!this.controller && this.controller.my;
+};
+
 Room.prototype.forbidden = function (){
     return this.find(FIND_FLAGS, {filter: f => _.startsWith(f.name, "forbidden")}).length > 0;
 };

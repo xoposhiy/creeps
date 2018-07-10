@@ -64,6 +64,11 @@ function r(what:any, roleName:string){
     });
 }
 
+function order(spawnName:string, type:string){
+    Game.spawns[spawnName].schedule(type);
+    return spawnName + ' orders queue: ' + Game.spawns[spawnName].memory.queue;
+}
+
 function d(id){
     Memory.debug = {};
     if (id)
@@ -71,6 +76,7 @@ function d(id){
 }
 
 export function populate(g){
+
     g.o = o;
     g.s = s;
     g.m = m;
@@ -81,4 +87,10 @@ export function populate(g){
         r(HEAL, 'ranger');
     };
     g.d = d;
+    g.order = order;
+
+    g.wo = function(){
+        order('Spawn1', 'worker');
+        order('home', 'worker');
+    }
 }

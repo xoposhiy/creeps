@@ -31,7 +31,7 @@ class Upgrader extends Role {
         if (upper && upper.pos.isNearTo(creep.pos) && !upper.pos.isNearTo(target) && target.pos.getAssignedCreeps().length == target.pos.countEmptyTilesAround()){
             creep.assignNewRole(true);
         }
-        creep.pickEnergy(['harvester', 'miner', 'reservator', 'builder']);
+        creep.pickEnergy(['harvester', 'miner', 'reservator']);
         return creep.upgradeController(target);
     }
 }

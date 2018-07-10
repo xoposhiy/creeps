@@ -19,20 +19,18 @@ class Cargo extends Role {
     }
 
     getTarget(creep:Creep):any {
-        return creep.pos.findClosestByPath(FIND_MY_CREEPS, {
+        return creep.pos.findClosestByPath<Creep>(FIND_MY_CREEPS, {
             filter: c =>
             c.memory.role == 'upgrader' && c.pos.canAssign(creep)
         });
     }
 
     finished(creep:Creep):boolean {
-        return creep.carry.energy == 0 || creep.memory.done;
+        return creep.carry.energy == 0;
     }
 
     interactWithTarget(creep:Creep, target:any):any {
-        var result = creep.transferEnergy(target);
-        creep.memory.done = result == OK;
-        return result;
+        return creep.transferEnergy(target);
     }
 }
 

@@ -17,8 +17,8 @@ class NoRole extends Role {
         return false;
     }
 
-    getTarget():any {
-        return undefined;
+    getTarget(creep:Creep):any {
+        return creep.moveTo(creep.room.controller);
     }
 
     finished():boolean {

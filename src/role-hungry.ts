@@ -88,7 +88,7 @@ class Hungry extends Role {
     }
 
     waitTimeout():number {
-        return 1;
+        return 10;
     }
 
     isTargetActual(creep:Creep, target:GameObject):boolean {
@@ -106,10 +106,11 @@ class Hungry extends Role {
         if(!dispatcher) return undefined;
         var t = this.getTimeToGetEnergyFromDispatcher(creep, dispatcher);
         if (creep.isDebug()) {
-            creep.log("best source: " + dispatcher.pos +
-                " t = " + this.getTimeToGetEnergyFromDispatcher(creep, dispatcher));
+            creep.log("best source: " + dispatcher.pos + " t = " + t);
         }
-        if (t < 40) {
+        var path = creep.pos.findPathTo(dispatcher.pos);
+        var wait = dispatcher.getTimeToWait(creep.carryCapacity - creep.carry.energy, path.length);
+        if (wait < 10) {
             var energyNeed = creep.carryCapacity - creep.carry.energy;
             var timeInRoad = creep.pos.findPathTo(dispatcher.pos).length;
             if (dispatcher.enqueue(energyNeed, timeInRoad, creep)) return dispatcher.pos;

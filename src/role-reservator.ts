@@ -23,19 +23,15 @@ class Reservator extends Role {
     }
 
     getTarget(creep:Creep):GameObject {
-        var spawnOrExtension = <Spawn|Extension>creep.pos.findClosestByPath(FIND_STRUCTURES,
+        var spawnOrExtension = <Spawn|Extension>creep.pos.findClosestByPath<Structure>(FIND_STRUCTURES,
             {filter: s => _.includes(["extension", "spawn"], s.structureType) &&
             this.isTargetActual(creep, s)
             });
-        if (spawnOrExtension && !_.includes(["extension", "spawn"], spawnOrExtension.structureType)){
-            var message = "spawnOrExtension is " + global.s(spawnOrExtension);
-            Game.notify(message, 1);
-        }
         if (spawnOrExtension) return spawnOrExtension; //better than storage!
-        var storage = <GameObject>creep.pos.findClosestByPath(FIND_STRUCTURES,
+        var storage = <Storage>creep.pos.findClosestByPath<Structure>(FIND_STRUCTURES,
             {filter: s => s.structureType == STRUCTURE_STORAGE
             && this.isTargetActual(creep, s)});
-        if (storage) return storage;
+        if (storage && storage.store.energy < storage.storeCapacity) return storage;
         return undefined;
     }
 }

@@ -2,8 +2,17 @@
 
 import roles = require('roles');
 import Role = require('Role');
+import EnergyMine = require('EnergyMine');
 
-Creep.prototype.assignNewRole = function (finished:boolean) : Role {
+Flag.prototype.mine = function(){
+    return new EnergyMine(this);
+};
+
+Creep.prototype.isWarrior = function ():boolean {
+    return this.getActiveBodyparts(ATTACK) + this.getActiveBodyparts(RANGED_ATTACK) > 0;
+};
+
+Creep.prototype.assignNewRole = function (finished:boolean):Role {
     return roles.assignNewRole(this, finished);
 };
 
@@ -22,7 +31,7 @@ Creep.prototype.takeEnergyFrom = function (obj:GameObject) {
     else {
         console.log("Can't take energy from " + obj);
         console.log(new Error()['stack']);
-        return false;
+        return -10;
     }
 };
 
@@ -37,7 +46,7 @@ Creep.prototype.isDebug = function () {
     return debug && (debug[creep.id] || debug[creep.name] || debug[creep.memory.role]);
 };
 
-Creep.prototype.bodyScore = function (requiredParts: string[]) {
+Creep.prototype.bodyScore = function (requiredParts:string[]) {
     var creep = <Creep>this;
     return _.reduce(requiredParts, (score, p) => score * creep.getActiveBodyparts(p), 1);
 };
@@ -62,23 +71,30 @@ function doRetreat(target, creep) {
     return {maxRange: maxRange, maxPos: maxPos};
 }
 
-Creep.prototype.pickEnergy = function(roles?:string[]):boolean{
+Creep.prototype.pickEnergy = function (roles?:string[]):boolean {
     var creep:Creep = this;
     var energyNear = creep.pos.getArea<Energy>("energy", 1);
     if (energyNear.length > 0)
         return creep.pickup(energyNear[0]) == OK;
-    if (creep.carry.energy < creep.carryCapacity - 20){
+    var link = creep.pos.getArea<Link>("structure", 1, s => s.structureType == STRUCTURE_LINK && (<Link>s).energy > 0)[0];
+    if (link) {
+        return creep.takeEnergyFrom(link) == OK;
+    }
+
+    var storage = creep.pos.getArea<Structure>("structure", 1, s => s.structureType == STRUCTURE_STORAGE && (<Storage>s).store.energy > 20)[0];
+    if (storage) return creep.takeEnergyFrom(storage) == OK;
+
+    if (creep.carry.energy < creep.carryCapacity - 20) {
         if (roles) {
             var creepsNear = creep.pos.getArea<Creep>("creep", 1, c => c.carry.energy > 0 && roles.indexOf(c.memory.role) >= 0);
             if (creepsNear.length > 0) return creep.takeEnergyFrom(creepsNear[0]) == OK;
         }
     }
-    if (creep.carry.energy == 0){
+    if (creep.carry.energy == 0) {
         var extensionNear = creep.pos.getArea<Extension>("structure", 1, s => s.structureType == "extension" && s.energy > 0);
         if (extensionNear.length > 0)
-            creep.takeEnergyFrom(extensionNear[0])
+            return creep.takeEnergyFrom(extensionNear[0]) == OK;
     }
-
     return false;
 };
 
@@ -90,7 +106,7 @@ Creep.prototype.approachAndDo = function (target, work, actRange:number, moveClo
         return false;
     }
     var targetPos = target.pos || target;
-    if (!targetPos.assign(creep)) {
+    if (!targetPos.isOnBorder() && !targetPos.assign(creep)) {
         this.log('cant be assigned to ' + targetPos);
         Memory.statsHang++;
         return false;
@@ -105,13 +121,13 @@ Creep.prototype.approachAndDo = function (target, work, actRange:number, moveClo
     }
     if (creep.fatigue > 0)
         this.log('REST ' + targetPos);
-    if (creep.fatigue == 0){
+    if (creep.fatigue == 0) {
         if (range > actRange || moveCloser) {
-            var moveRes = creep.moveTo(target);
-            this.log('MOVE ' + targetPos + ' -> ' + moveRes);
+            var moveRes = creep.moveTo(target, {reusePath: 10});
+            this.log('MOVE! ' + targetPos + ' -> ' + moveRes);
             success = success && moveRes == OK;
         }
-        if (range < actRange) {
+        else if (range < actRange) {
             var retreatRes = doRetreat(targetPos, creep);
             var moveRes = creep.move(retreatRes.maxPos);
             this.log('MOVE ' + targetPos + ' -> ' + moveRes);
@@ -122,16 +138,31 @@ Creep.prototype.approachAndDo = function (target, work, actRange:number, moveClo
     return success;
 };
 
-Creep.prototype.control = function control()
-{
+
+Creep.prototype.longMemory = function ():CreepLongMemory {
+    return Memory.creepLongMemory[this.id] || (Memory.creepLongMemory[this.id] = {});
+};
+
+var obligatoryCreepActions = function (creep:Creep) {
+    if (creep.room.isMy())
+        creep.longMemory().roomName = creep.room.name;
+    if (creep.hits < creep.hitsMax) creep.heal(creep);
+    if (creep.carry.energy < creep.carryCapacity) {
+        var energy = creep.pos.getArea<Energy>('energy', 1)[0];
+        if (energy) creep.pickup(energy);
+    }
+};
+
+Creep.prototype.control = function control() {
     var creep = this;
     if (creep.spawning) return;
-    if (creep.hits < creep.hitsMax) creep.heal(creep);
+    obligatoryCreepActions(creep);
     var role = creep.getRole();
     if (role.finished(creep))
         role = creep.assignNewRole(true);
     if (role.finished(creep)) {
         Memory.statsNo++;
+        creep.move(Game.time % 8 + 1);
         return;
     } // new role is bad :(
     if (creep.memory.role == 'no')
@@ -147,15 +178,16 @@ Creep.prototype.control = function control()
     }
 };
 
-Creep.makeBody = function(maxEnergy:number, segment:string[], maxSegmentsCount:number = 100500, startSegment:string[] = [], endSegment:string[] = []):string[]{
+Creep.makeBody = function (maxEnergy:number, segment:string[], maxSegmentsCount:number = 100500, startSegment:string[] = [], endSegment:string[] = []):string[] {
     var segmentCost = Creep.bodyCost(segment);
+    maxSegmentsCount = Math.min(maxSegmentsCount, (50 - startSegment.length + endSegment.length) / segment.length);
     var energyLeft = maxEnergy - Creep.bodyCost(startSegment) - Creep.bodyCost(endSegment);
     var count = Math.min(maxSegmentsCount, Math.floor(energyLeft / segmentCost));
     var mainBody = _.chain(0).range(count).map(i => segment).flatten().value();
     return startSegment.concat(mainBody).concat(endSegment);
 };
 
-Creep.bodypartCost = function(bodypart:string) {
+Creep.bodypartCost = function (bodypart:string) {
     switch (bodypart) {
         case WORK:
             return 100;
@@ -175,7 +207,7 @@ Creep.bodypartCost = function(bodypart:string) {
     }
 };
 
-Creep.bodyCost = function(bodyparts:string[]){
+Creep.bodyCost = function (bodyparts:string[]) {
     return _.sum(bodyparts, p => Creep.bodypartCost(p));
 };
 

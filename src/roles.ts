@@ -1,11 +1,17 @@
 ///<reference path="screeps-extended.d.ts"/>
 
-//import Profiler = require('profiler');
+import Profiler = require('profiler');
 import Role = require('Role');
 
 var allRoles = [
-    'no', 'builder', 'cargo', 'harvester', 'hungry', 'reservator', 'returner', 'upgrader', 'scout',
-    'claimer', 'flag', 'ranger', 'warrior', 'healer', 'retreater', 'soldier', "miner", 'defender', 'upper'
+    'no',
+    'builder', 'upgrader', 'cargo', 'harvester',
+    'hungry', 'reservator',
+    'transport',
+    'returner', 'scout',
+    'upper',
+    'claimer', 'flag',
+    'ranger',  'retreater', 'soldier', 'warrior', 'healer', 'defender', 'tank'
 ];
 
 var req = function(module){
@@ -14,7 +20,7 @@ var req = function(module){
 
 function loadRole(roleName){
     var roleClass = req('role-' + roleName);
-    //Profiler.wrapAll(roleClass);
+    Profiler.wrapAll(roleClass);
     return new roleClass();
 }
 var roles = {
@@ -60,7 +66,7 @@ function getNewRole(creep){
         totalCreeps = totalCreeps || 0;
         if (!creeps[role]) console.log("unknown " + role);
         return (_.values(Game.creeps).length >= totalCreeps &&
-            _.filter(creeps[role], (c:Creep) => c.room.name == creep.room.name).length < maxCreepsThisRole &&
+            _.filter(creeps[role], (c:Creep) => c.longMemory().roomName == creep.longMemory().roomName).length < maxCreepsThisRole &&
             roles.impl[role].fits(creep)) ?
                 role : undefined;
     };
@@ -82,22 +88,26 @@ function getNewRole(creep){
         tryRole('defender') ||
         tryRole('healer') ||
         tryRole('soldier') ||
+        tryRole('tank') ||
         tryRole('ranger') ||
         //no energy:
-        tryRole('miner') ||
         tryRole('upper') ||
+        tryRole('harvester', 2) ||
+        tryRole('transport', 2) ||
         tryRole('harvester') ||
-        tryRole('hungry') ||
-        tryRole('scout') ||
+        tryRole('transport') ||
+        //tryRole('scout') ||
         // has energy:
-        tryRole('returner') ||
-        tryRole('reservator', creep.room.isSpawningTime() ? 3: 1) ||
-        tryRole('builder', constructionSites + 1) ||
-        tryRole('upgrader') ||
         tryRole('reservator', 2) ||
-        tryRole('cargo', 1) ||
+        tryRole('builder', 1) ||
+        tryRole('upgrader', 1) ||
+        tryRole('builder', Math.min(4, constructionSites + 2)) ||
+        tryRole('upgrader') ||
+        tryRole('reservator', 4) ||
+        //tryRole('cargo', 2) ||
         tryRole('builder') ||
         tryRole('reservator') ||
+        tryRole('returner') ||
         'no'
     );
 }
